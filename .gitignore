@@ -27,6 +27,7 @@
 .vs/
 # I added this myself: not sure why this directory is already here, haven't opened in VS Code yet
 .vscode/
+.vsconfig
 
 # Gradle cache directory
 .gradle/
