@@ -15,7 +15,7 @@ public class Node_Handler : MonoBehaviour
     void Start()
     {
         _render = GetComponent<SpriteRenderer>();
-        _render.color =  _color;
+        _render.material.SetColor("red",_color);
     }
 
     // Update is called once per frame
