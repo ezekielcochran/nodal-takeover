@@ -4,9 +4,11 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
-public class Node_Controller : MonoBehaviour
+public class Node_Creator : MonoBehaviour
 {
     // Start is called before the first frame update
+
+    public GameObject prefab;
     void Start()
     {
         // Create Nodes as Children
@@ -18,13 +20,12 @@ public class Node_Controller : MonoBehaviour
             Debug.LogError("Nodes game object not found!");
         }
 
-        GameObject prefab = (GameObject)Resources.Load("Node", typeof(GameObject));
+        // GameObject prefab = (GameObject)Resources.Load("Node", typeof(GameObject));
 
-        if (prefab == null)
-        {
-            Debug.LogError("Nodes game object not found!");
-        }
-
+        // if (prefab == null)
+        // {
+        //     Debug.LogError("Nodes prefab not found!");
+        // }
 
         // Generate Coordinates for Nodes
         float[][] generatedCoordinates = GenerateCoordinates();
@@ -32,16 +33,13 @@ public class Node_Controller : MonoBehaviour
         // Create the nodes to operate on
         List<GameObject> NodeList = new List<GameObject>();
 
+        Debug.Log(transform.position.x);
+
         // Add objects to the list:
-        for (int i = 0; i < NodeList.Count; i++){
+        for (int i = 0; i < generatedCoordinates.Length; i++){
             NodeList.Add(Instantiate(prefab, NodeContainer.transform.position, NodeContainer.transform.rotation, NodeContainer.transform));
             NodeList[i].GetComponent<Transform>().position = new Vector3(generatedCoordinates[i][0], generatedCoordinates[i][1],0);
         }
-        // NodeList.Add(Instantiate(prefab, NodeContainer.transform.position, NodeContainer.transform.rotation, NodeContainer.transform));
-        // NodeList.Add(GameObject.Find("Object2"));
-
-        // Access elements:
-        
 
         // Get count of elements:
         int count = NodeList.Count;

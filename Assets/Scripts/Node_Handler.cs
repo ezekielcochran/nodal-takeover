@@ -7,20 +7,26 @@ public class Node_Handler : MonoBehaviour
 
 
 
-    private SpriteRenderer _render;
-    private Color _color;
-
-    
+    private SpriteRenderer _render;    
     // Start is called before the first frame update
     void Start()
     {
         _render = GetComponent<SpriteRenderer>();
-        _render.material.SetColor("red",_color);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.Space)){
+            if (_render.color == Color.white){ _render.color = Color.red;}
+            else{ _render.color = Color.white;}
+            // _render.color = Color.red;
+        }
+    }
+
+    // Allow color to change when the Node is clicked
+    void OnMouseDown(){
+        if (_render.color == Color.white){ _render.color = Color.red;}
+        else{ _render.color = Color.white;}
     }
 }
