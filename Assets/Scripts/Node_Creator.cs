@@ -17,7 +17,7 @@ public class Node_Creator : MonoBehaviour
         // If "Nodes" doesn't exist, handle the error or return null
         if (NodeContainer == null)
         {
-            Debug.LogError("Nodes game object not found!");
+            Debug.Log("Nodes game object not found!");
         }
 
         // GameObject prefab = (GameObject)Resources.Load("Node", typeof(GameObject));
@@ -32,8 +32,6 @@ public class Node_Creator : MonoBehaviour
 
         // Create the nodes to operate on
         List<GameObject> NodeList = new List<GameObject>();
-
-        Debug.Log(transform.position.x);
 
         // Add objects to the list:
         for (int i = 0; i < generatedCoordinates.Length; i++){
