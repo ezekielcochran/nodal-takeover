@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class LevelsMenu : MonoBehaviour
+public class UINavigation : MonoBehaviour
 {
     // Start is called before the first frame update
     // void Start()
@@ -25,6 +25,16 @@ public class LevelsMenu : MonoBehaviour
     // Seems like a tacky way to do this... please fix later, this is just for prototype
     public void ToLevelsMenu() {
         SceneManager.LoadSceneAsync("Level Select");
+    }
+
+    public void MoveToScene(int sceneID) {
+		SceneManager.LoadScene(sceneID);
+	}
+
+    public void QuitGame()
+    {
+        Debug.Log("Quit");
+        Application.Quit();
     }
 
     // Update is called once per frame
