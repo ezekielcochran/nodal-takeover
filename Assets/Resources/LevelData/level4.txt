@@ -1,0 +1,10 @@
+ld This is the first level to be automatically generated!
+
+nc 3
+
+n 1 0.2 0.5
+n 2 0.8 0.5
+n 3 0.5 0.3
+
+c 1 2
+c 2 3
