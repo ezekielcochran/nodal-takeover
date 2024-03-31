@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.IO;
 
 public class UINavigation : MonoBehaviour
 {
@@ -35,6 +36,29 @@ public class UINavigation : MonoBehaviour
     {
         Debug.Log("Quit");
         Application.Quit();
+    }
+
+    // These three functions are only for prototype, before level functionality takes care of this
+    public void IncrementLevelsUnlocked()
+    {
+        int x = PlayerPrefs.GetInt("levelsUnlocked");
+        PlayerPrefs.SetInt("levelsUnlocked", x + 1);
+        Debug.Log("Levels Unlocked: " + PlayerPrefs.GetInt("levelsUnlocked"));
+        UpdateLevelLockText();
+    }
+    
+    public void DecrementLevelsUnlocked()
+    {
+        int x = PlayerPrefs.GetInt("levelsUnlocked");
+        PlayerPrefs.SetInt("levelsUnlocked", x - 1);
+        Debug.Log("Levels Unlocked: " + PlayerPrefs.GetInt("levelsUnlocked"));
+        UpdateLevelLockText();
+    }
+
+    public void UpdateLevelLockText()
+    {
+        GameObject levelLockText = GameObject.Find("Display Level Lock");
+        levelLockText.GetComponent<TMPro.TextMeshProUGUI>().text = "Levels Unlocked: " + PlayerPrefs.GetInt("levelsUnlocked");
     }
 
     // Update is called once per frame

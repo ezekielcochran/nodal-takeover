@@ -13,6 +13,8 @@ public class LineController : MonoBehaviour
     // Some methods use origin and destination: thsese depend on which node is attacking
     private Transform start, end;
 
+    // just for colored lines to show up on top of each other for prototype: NOT THOUGHT OUT, NOT FINAL
+    private static int prototypeTempSortingOrder = 1;
     // Start is called before the first frame update
     void Start() {}
 
@@ -88,7 +90,9 @@ public class LineController : MonoBehaviour
 
         // Set the sorting layer for the progress line renderer: we want it in the Lines layer, but in front of the background line
         progress.sortingLayerName = "Lines";
-        progress.sortingOrder = backgroundLine.sortingOrder + 1;
+        // progress.sortingOrder = backgroundLine.sortingOrder + 1;
+        prototypeTempSortingOrder++;
+        progress.sortingOrder = prototypeTempSortingOrder;
 
         // Set the progress color from the input parameter
         GradientColorKey[] colorKey = new GradientColorKey[2];

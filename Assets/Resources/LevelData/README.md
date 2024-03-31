@@ -10,8 +10,11 @@ Each line of each level's file corresponds to one of the following:
 | **nc** | Node Count | `int` | total number of nodes |
 | **n** | Node | `int float float` | node index, node x-coordinate, node y-coordinate |
 | **c** | Connection | `int int` | The indexes of two connected nodes, with the first smaller than the second |
+| **#** | Comment | `string` | comment line |
 
 How to format:
+- Node Count (nc) *must* be defined
+- Connections (c) *cannot* connect indices higher than nodes are defined
 - The lines should be organized into sections
   - One section for each type
   - Ordered as in the above table
@@ -24,6 +27,7 @@ ld A fun level!
 
 nc 6
 
+# The six nodes are arranged in this shape: <□>
 n 1 0.2 0.5
 n 2 0.4 0.3
 n 3 0.4 0.7

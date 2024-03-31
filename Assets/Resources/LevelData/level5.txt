@@ -2,6 +2,7 @@ ld The second auto-generated level: doesn't yet have it's own button from level 
 
 nc 6
 
+# The six nodes are arranged in this shape: <□>
 n 1 0.2 0.5
 n 2 0.4 0.3
 n 3 0.4 0.7

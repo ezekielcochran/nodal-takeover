@@ -9,7 +9,8 @@ using UnityEngine;
 public class Node_Handler : MonoBehaviour
 {
     private bool attacking = false;
-    private float attackProgressToAll = 0.0f;
+    private float attackProgress = 0.0f;
+    private float speed;
 
 
     private SpriteRenderer _render;    
@@ -17,6 +18,7 @@ public class Node_Handler : MonoBehaviour
     void Start()
     {
         _render = GetComponent<SpriteRenderer>();
+        speed = GameObject.Find("Level Elements").GetComponent<LevelBuilder>().GetAttackSpeed();
     }
 
     // Update is called once per frame
@@ -42,74 +44,48 @@ public class Node_Handler : MonoBehaviour
     }
     public void SimulateClick() {
         if (_render.color == Color.white){ _render.color = Color.red;}
+        else if (_render.color == Color.red){ _render.color = Color.blue;}
+        else if (_render.color == Color.blue){ _render.color = Color.green;}
+        else if (_render.color == Color.green){ _render.color = Color.yellow;}
+        else if (_render.color == Color.yellow){ _render.color = Color.black;}
+        else if (_render.color == Color.black){ _render.color = Color.magenta;}
+        else if (_render.color == Color.magenta){ _render.color = Color.white;}
         else{ _render.color = Color.white;}
+            
         AttackSomeoneRandom();
     }
 
-    // Allow color to change when the Node is clicked
-    private void AttackEveryone(){
-        if (attacking) {return;} // If the node is already attacking, don't allow it to attack again (this is to prevent infinite loops and duplicate attacing paths)
-            attacking = true;
-            LevelBuilder levelBuilder = GameObject.Find("Level Elements").GetComponent<LevelBuilder>();
-            GameObject[] neighbors = levelBuilder.FindNeighbors(gameObject);
-
-            // Start an Attack to all neighboring nodes
-            for (int i = 0; i < neighbors.Length; i++)
-            {
-                LineController lineController = levelBuilder.GetConnectionController(gameObject, neighbors[i]);
-                lineController.StartAttack(gameObject.transform, Color.red, 0.0f);
-                // neighbors[i].GetComponent<Node_Handler>().simulateClick();
-            }
-            StartCoroutine(AttackAll());
-    }
-
     private void AttackSomeoneRandom(){
+        // Infinite loops might still be a problem, because attacking is turned back off once the attack is finished
         if (attacking) {return;} // If the node is already attacking, don't allow it to attack again (this is to prevent infinite loops and duplicate attacing paths)
         attacking = true;
         LevelBuilder levelBuilder = GameObject.Find("Level Elements").GetComponent<LevelBuilder>();
         GameObject[] neighbors = levelBuilder.FindNeighbors(gameObject);
+        if (neighbors.Length == 0) {return;} // If the node has no neighbors, there is no one to attack
 
         // Start an Attack to a random neighboring node
         int randomIndex = UnityEngine.Random.Range(0, neighbors.Length);
         LineController lineController = levelBuilder.GetConnectionController(gameObject, neighbors[randomIndex]);
-        lineController.StartAttack(gameObject.transform, Color.red);
-        StartCoroutine(AttackRandom(neighbors[randomIndex]));
+        lineController.StartAttack(gameObject.transform, _render.color);
+        StartCoroutine(AttackRandom(neighbors[randomIndex], speed));
     }
 
-    IEnumerator AttackAll(float speed = 0.2f){ // 1 means a connection is covered in 1 second
-        while (attackProgressToAll < 1.0f)
+    IEnumerator AttackRandom(GameObject target, float speed = 0.5f){ // 1 means a connection is covered in 1 second
+        while (attackProgress < 1.0f)
         {
-            attackProgressToAll += Time.deltaTime * speed;
+            attackProgress += Time.deltaTime * speed;
             // Debug.Log(attackProgressToAll);
-            updateAttacks(attackProgressToAll);
-            yield return null;
-        }
-    }
-
-    IEnumerator AttackRandom(GameObject target, float speed = 0.2f){ // 1 means a connection is covered in 1 second
-        while (attackProgressToAll < 1.0f)
-        {
-            attackProgressToAll += Time.deltaTime * speed;
-            // Debug.Log(attackProgressToAll);
-            updateRandomAttack(target, attackProgressToAll);
+            updateRandomAttack(target, attackProgress);
             yield return null;
         }
         target.GetComponent<Node_Handler>().SimulateClick();
+        attacking = false;
+        attackProgress = 0.0f;
     }
 
     private void updateRandomAttack(GameObject target, float progress){
         LevelBuilder levelBuilder = GameObject.Find("Level Elements").GetComponent<LevelBuilder>();
         LineController lineController = levelBuilder.GetConnectionController(gameObject, target);
         lineController.UpdateAttack(gameObject.transform, progress);
-    }
-
-    private void updateAttacks(float progress){
-        LevelBuilder levelBuilder = GameObject.Find("Level Elements").GetComponent<LevelBuilder>();
-        GameObject[] neighbors = levelBuilder.FindNeighbors(gameObject);
-        for (int i = 0; i < neighbors.Length; i++)
-        {
-            LineController lineController = levelBuilder.GetConnectionController(gameObject, neighbors[i]);
-            lineController.UpdateAttack(gameObject.transform, progress);
-        }
     }
 }

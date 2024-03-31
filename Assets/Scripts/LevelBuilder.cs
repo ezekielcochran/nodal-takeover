@@ -10,12 +10,15 @@ public class LevelBuilder : MonoBehaviour
     [SerializeField] private int levelNumber; // [SerializeField] forces Unity to allow initialization of a private variable within the Unity Editor
     [SerializeField] private GameObject nodePrefab;
     [SerializeField] private GameObject lineControllerPrefab;
+    [SerializeField] private float attackSpeed = 0.5f;
     private GameObject[] nodes;
     private GameObject[,] connectionLines;
+    
 
     // Start is called before the first frame update
     // It creates objects for nodes and connections based on the level data
     // It also initailizes the nodes and connections arrays
+    // It could stand a little method extraction
     void Start()
     {
         // Get the LevelElements object to parent the nodes to
@@ -54,7 +57,7 @@ public class LevelBuilder : MonoBehaviour
         }
     }
 
-    // This function returns the LineController object that connects the two input nodes
+    // Return the LineController object that connects the two input nodes
     public LineController GetConnectionController(GameObject node1, GameObject node2)
     {
         int node1Index = NodeToIndex(node1);
@@ -70,7 +73,7 @@ public class LevelBuilder : MonoBehaviour
         }
     }
 
-    // This function returns an array of GameObjects that are neighbors of the input node
+    // Return an array of GameObjects that are neighbors of the input node
     public GameObject[] FindNeighbors(GameObject node)
     {
         int nodeIndex = NodeToIndex(node);
@@ -85,7 +88,7 @@ public class LevelBuilder : MonoBehaviour
         return neighbors.ToArray();
     }
 
-    // This function returns the index of a node based on it's GameObject
+    // Return the index of a node based on its GameObject
     private int NodeToIndex(GameObject node)
     {
         for (int i = 0; i < nodes.Length; i++)
@@ -98,21 +101,9 @@ public class LevelBuilder : MonoBehaviour
         return -1;
     }
 
-    // This function returns the index of a node based on it's transform
-    // private int TransformToIndex(Transform transform)
-    // {
-    //     for (int i = 0; i < nodes.Length; i++)
-    //     {
-    //         if (nodes[i].transform == transform)
-    //         {
-    //             return i;
-    //         }
-    //     }
-    //     return -1;
-    // }
-
     // This function reads the level data from a file into a struct, leaving values as in the file. For example, positions are left in viewport coordinates (from 0 to 1)
     // However, nodes are 0-based in the array, so they must be decremented by 1 when used as indices
+    // Also, stream reader may not work for android builds, so this may need to be changed
     LevelData GetLevelData(int level)
     {
         // Application.dataPath points to the Assets folder in unity play mode, and Contents within the .app bundle in a build for mac
@@ -147,7 +138,9 @@ public class LevelBuilder : MonoBehaviour
             {
                 // Process each line of the file here
                 string[] splitLine = line.Split(null);
-                if (splitLine[0] == "nc") {
+                if (splitLine[0] == "#" || line == "") {
+                    // Skip comments and empty lines
+                } else if (splitLine[0] == "nc") {
                     // Add node count and initialize positions array and connections matrix... I think this must happen before nodes and connections
                     result.nodeCount = int.Parse(splitLine[1]);
                     result.nodePositions = new Vector3[result.nodeCount];
@@ -163,6 +156,8 @@ public class LevelBuilder : MonoBehaviour
                 } else if (splitLine[0] == "c") {
                     // Add connection between nodes
                     result.nodeConnections[int.Parse(splitLine[1]) - 1, int.Parse(splitLine[2]) - 1] = 1;
+                } else {
+                    Debug.LogWarning("Unrecognized line in level data: " + line);
                 }
             }
         }
@@ -180,6 +175,11 @@ public class LevelBuilder : MonoBehaviour
         {
             return "Level: " + level + " Description: " + levelDescription;
         }
+    }
+
+    public float GetAttackSpeed()
+    {
+        return attackSpeed;
     }
 
     // Update is called once per frame
