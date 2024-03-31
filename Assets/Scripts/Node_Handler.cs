@@ -18,7 +18,6 @@ public class Node_Handler : MonoBehaviour
     void Start()
     {
         _render = GetComponent<SpriteRenderer>();
-        speed = GameObject.Find("Level Elements").GetComponent<LevelBuilder>().GetAttackSpeed();
     }
 
     // Update is called once per frame
@@ -60,6 +59,7 @@ public class Node_Handler : MonoBehaviour
         if (attacking) {return;} // If the node is already attacking, don't allow it to attack again (this is to prevent infinite loops and duplicate attacing paths)
         attacking = true;
         LevelBuilder levelBuilder = GameObject.Find("Level Elements").GetComponent<LevelBuilder>();
+        if (speed <= 0.0f) {speed = levelBuilder.GetAttackSpeed();} // If the speed is not set, get it from the LevelBuilder, where it exists as a paramater
         GameObject[] neighbors = levelBuilder.FindNeighbors(gameObject);
         if (neighbors.Length == 0) {return;} // If the node has no neighbors, there is no one to attack
 

@@ -309,7 +309,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &970328476
+--- !u!1001 &1080029624
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -317,26 +317,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3188991078818674939, guid: d19c65b27b6a94f6896b85a04e025644, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 3188991078818674939, guid: d19c65b27b6a94f6896b85a04e025644, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Mode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3188991078818674939, guid: d19c65b27b6a94f6896b85a04e025644, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Target
-      value: 
-      objectReference: {fileID: 1367563230}
-    - target: {fileID: 3188991078818674939, guid: d19c65b27b6a94f6896b85a04e025644, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_CallState
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 3188991078818674939, guid: d19c65b27b6a94f6896b85a04e025644, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
-      value: UnityEngine.GameObject, UnityEngine
-      objectReference: {fileID: 0}
     - target: {fileID: 4482658631219995455, guid: d19c65b27b6a94f6896b85a04e025644, type: 3}
       propertyPath: m_Name
       value: Pause Canvas
@@ -426,11 +406,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d19c65b27b6a94f6896b85a04e025644, type: 3}
---- !u!1 &1367563230 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4482658631219995455, guid: d19c65b27b6a94f6896b85a04e025644, type: 3}
-  m_PrefabInstance: {fileID: 970328476}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1844655422
 GameObject:
   m_ObjectHideFlags: 0
@@ -463,6 +438,7 @@ MonoBehaviour:
   levelNumber: 4
   nodePrefab: {fileID: 7197121204860646038, guid: a250d90a54800184ba95ed8398f4b5c7, type: 3}
   lineControllerPrefab: {fileID: 9073758782690554400, guid: 98ee392915cf6444cbad66b3ddb7b14e, type: 3}
+  attackSpeed: 0.5
 --- !u!4 &1844655424
 Transform:
   m_ObjectHideFlags: 0
@@ -483,6 +459,6 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 644441399}
-  - {fileID: 970328476}
+  - {fileID: 1080029624}
   - {fileID: 1844655424}
   - {fileID: 629677201}

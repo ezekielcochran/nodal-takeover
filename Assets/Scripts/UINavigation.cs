@@ -61,6 +61,56 @@ public class UINavigation : MonoBehaviour
         levelLockText.GetComponent<TMPro.TextMeshProUGUI>().text = "Levels Unlocked: " + PlayerPrefs.GetInt("levelsUnlocked");
     }
 
+    // This function grabs the current level number from the LevelElements object and tries to load the next level... it does NOT check if the next level exists
+    public void ToNextLevel()
+    {
+        try
+        {
+            int currentLevel = GameObject.Find("Level Elements").GetComponent<LevelBuilder>().GetLevelNumber();
+            ToLevel(currentLevel + 1);
+        }
+        catch (System.NullReferenceException)
+        {
+            Debug.Log("Tried to load Next level but Level Elements not found");
+            return;
+        }
+    }
+
+    // This function checks whether the next level is unlocked, and removes the next level button if not
+    public void CheckNextLevel()
+    {
+        Debug.Log("Checking Next Level");
+        try
+        {
+            int currentLevel = GameObject.Find("Level Elements").GetComponent<LevelBuilder>().GetLevelNumber();
+            if (PlayerPrefs.GetInt("levelsUnlocked") <= currentLevel)
+            {
+                GameObject.Find("Next Level Button").SetActive(false);
+                // Debug.Log("Next Level Button Disabled, level is not unlocked");
+            }
+        }
+        catch (System.NullReferenceException)
+        {
+            Debug.Log("Tried to check Next level but Level Elements not found");
+            return;
+        }
+    }
+
+    // This function grabs the current level number from the LevelElements object and tries to load the previous level... it does NOT check if the previous level exists
+    public void ToPreviousLevel()
+    {
+        try
+        {
+            int currentLevel = GameObject.Find("Level Elements").GetComponent<LevelBuilder>().GetLevelNumber();
+            ToLevel(currentLevel - 1);
+        }
+        catch (System.NullReferenceException)
+        {
+            Debug.Log("Tried to load Previous Level but Level Elements not found");
+            return;
+        }
+    }
+
     // Update is called once per frame
     // void Update()
     // {

@@ -182,6 +182,10 @@ public class LevelBuilder : MonoBehaviour
         return attackSpeed;
     }
 
+    public int GetLevelNumber()
+    {
+        return levelNumber;
+    }
     // Update is called once per frame
     void Update()
     {
