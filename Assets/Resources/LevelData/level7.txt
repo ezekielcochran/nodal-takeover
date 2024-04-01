@@ -1,0 +1,24 @@
+ld a Smiley :)
+
+nc 9
+
+# left eye
+n 1 0.3 0.7
+# right eye
+n 2 0.7 0.7
+# smile
+n 3 0.2 0.5
+n 4 0.3 0.4
+n 5 0.4 0.35
+n 6 0.5 0.34
+n 7 0.6 0.35
+n 8 0.7 0.4
+n 9 0.8 0.5
+
+# connect just the smile
+c 3 4
+c 4 5
+c 5 6
+c 6 7
+c 7 8
+c 8 9

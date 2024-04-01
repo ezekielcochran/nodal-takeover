@@ -1,0 +1,21 @@
+ld The second auto-generated level: doesn't yet have it's own button from level selector, but is just an alternate data file to prove generality
+
+nc 6
+
+# The six nodes are arranged in this shape: <□>
+n 1 0.2 0.5
+n 2 0.4 0.3
+n 3 0.4 0.7
+n 4 0.6 0.3
+n 5 0.6 0.7
+n 6 0.8 0.5
+
+c 1 2
+c 1 3
+c 2 3
+c 2 4
+c 3 4
+c 3 5
+c 4 5
+c 4 6
+c 5 6
