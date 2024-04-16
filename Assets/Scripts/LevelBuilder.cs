@@ -55,6 +55,8 @@ public class LevelBuilder : MonoBehaviour
                 }
             }
         }
+        GameController gameController = GameObject.Find("Game Controller").GetComponent<GameController>();
+        gameController.SetNodesLines(nodes, connectionLines);
     }
 
     // Return the LineController object that connects the two input nodes
@@ -186,6 +188,7 @@ public class LevelBuilder : MonoBehaviour
     {
         return levelNumber;
     }
+
     // Update is called once per frame
     void Update()
     {

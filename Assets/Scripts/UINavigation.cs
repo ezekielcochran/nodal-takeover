@@ -79,7 +79,7 @@ public class UINavigation : MonoBehaviour
     // This function checks whether the next level is unlocked, and removes the next level button if not
     public void CheckNextLevel()
     {
-        Debug.Log("Checking Next Level");
+        // Debug.Log("Checking Next Level");
         try
         {
             int currentLevel = GameObject.Find("Level Elements").GetComponent<LevelBuilder>().GetLevelNumber();
