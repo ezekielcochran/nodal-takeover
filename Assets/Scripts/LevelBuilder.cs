@@ -13,7 +13,6 @@ public class LevelBuilder : MonoBehaviour
     [SerializeField] private float attackSpeed = 0.5f;
     private GameObject[] nodes;
     private GameObject[,] connectionLines;
-    
 
     // Start is called before the first frame update
     // It creates objects for nodes and connections based on the level data
@@ -21,6 +20,7 @@ public class LevelBuilder : MonoBehaviour
     // It could stand a little method extraction
     void Start()
     {
+        Debug.Log("Level Builder Start");
         // Get the LevelElements object to parent the nodes to
         GameObject levelElements = GameObject.Find("Level Elements"); // maybe handle error if object missing
         // Get the level data
@@ -57,6 +57,10 @@ public class LevelBuilder : MonoBehaviour
         }
         GameController gameController = GameObject.Find("Game Controller").GetComponent<GameController>();
         gameController.SetNodesLines(nodes, connectionLines);
+
+        // Assign the start nodes for player and computer
+        gameController.UpdateOwnership(nodes[0], 1, 1);
+        gameController.UpdateOwnership(nodes[levelData.nodeCount - 1], 2, 2);
     }
 
     // Return the LineController object that connects the two input nodes
@@ -91,7 +95,7 @@ public class LevelBuilder : MonoBehaviour
     }
 
     // Return the index of a node based on its GameObject
-    private int NodeToIndex(GameObject node)
+    public int NodeToIndex(GameObject node)
     {
         for (int i = 0; i < nodes.Length; i++)
         {

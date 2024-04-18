@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 1751148875037432877}
   - component: {fileID: 6636696741146932050}
   - component: {fileID: 618516111333114667}
-  - component: {fileID: -9110236888946582833}
   - component: {fileID: -6813757624263500509}
+  - component: {fileID: 6954377171808602746}
   m_Layer: 0
   m_Name: Node
   m_TagString: Untagged
@@ -122,18 +122,6 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
---- !u!114 &-9110236888946582833
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7197121204860646038}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25829bef4c00ba14fa9d98e502000cda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!120 &-6813757624263500509
 LineRenderer:
   serializedVersion: 2
@@ -238,3 +226,19 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!114 &6954377171808602746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7197121204860646038}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 762cc0086e789124a878acecfde03a84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  circle: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  square: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  hexagon: {fileID: -2135585597343286014, guid: 5aa8b770bc43046bc8d993d0d5b7f4a5, type: 3}
+  triangle: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}

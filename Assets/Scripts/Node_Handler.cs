@@ -12,7 +12,6 @@ public class Node_Handler : MonoBehaviour
     private float attackProgress = 0.0f;
     private float speed;
 
-
     private SpriteRenderer _render;    
     // Start is called before the first frame update
     void Start()
