@@ -12,63 +12,43 @@ public class LineController : MonoBehaviour
     // leftPoint and rightPoint do NOT change: they are the start and end points of the background line in increasing node index order
     // Some methods use origin and destination: thsese depend on which node is attacking
     private Transform leftPoint, rightPoint;
+    private int leftAttackShape, rightAttackShape;
+    private float leftAttackProgress, rightAttackProgress;
+    private bool active = false;
+    private GameController gameController;
 
     // Start is called before the first frame update
-    void Start() {}
+    void Start() {
+        try {
+            gameController = GameObject.Find("Game Controller").GetComponent<GameController>();
+        } catch {
+            gameController = null; // This is the case when the LineController is used in the level menu
+        }
+    }
 
     public void DrawBackgroundSegment(Transform start, Transform end)
     {
-        this.leftPoint = start;
-        this.rightPoint = end;
+        leftPoint = start;
+        rightPoint = end;
         backgroundLine = GetComponent<LineRenderer>(); // Moving the initialization to Start() doesn't work... seems that new instances don't get their Start() methods called
         backgroundLine.positionCount = 2;
         backgroundLine.SetPosition(0, start.position);
         backgroundLine.SetPosition(1, end.position);
     }
 
-    // public void UpdateAttack(Transform origin, float progress) // Must be called after StartAttack is called with the same origin
-    // {
-    //     LineRenderer progressLine;
-    //     Transform destination;
-    //     if (origin == leftPoint)
-    //     {
-    //         destination = rightPoint;
-    //         progressLine = leftAttackLine;
-    //     }
-    //     else if (origin == rightPoint)
-    //     {
-    //         destination = leftPoint;
-    //         progressLine = rightAttackLine;
-    //     }
-    //     else
-    //     {
-    //         Debug.LogError("Error: LineController.Embark() called with a transform that is not a start or end point");
-    //         return;
-    //     }
-
-    //     Vector3 midpoint = Vector3.Lerp(origin.position, destination.position, progress);
-    //     progressLine.SetPosition(1, midpoint);
-    // }
-
-    public void StartAttack(Transform origin, Color color, int shape, float initialProgress = 0.0f) // Must be called after DrawBackgroundSegment
+    private void UpdateAttack(Transform origin, float progress) // Must be called after StartAttack is called with the same origin
     {
-        // We cannot attach multiple Renderers to the same object, so we spawn a new empty child object for the progress line
-        LineRenderer progress = new GameObject().AddComponent<LineRenderer>();
-        progress.gameObject.transform.SetParent(transform, false);
-        progress.gameObject.transform.SetPositionAndRotation(transform.position, transform.rotation);
-
+        LineRenderer progressLine;
         Transform destination;
         if (origin == leftPoint)
         {
             destination = rightPoint;
-            progress.gameObject.name = "Left Attack";
-            leftAttackLine = progress;
+            progressLine = leftAttackLine;
         }
         else if (origin == rightPoint)
         {
             destination = leftPoint;
-            progress.gameObject.name = "Right Attack";
-            rightAttackLine = progress;
+            progressLine = rightAttackLine;
         }
         else
         {
@@ -76,18 +56,101 @@ public class LineController : MonoBehaviour
             return;
         }
 
+        // if (progressLine == null) {
+        //     return;
+        // }
+        Vector3 midpoint = Vector3.Lerp(origin.position, destination.position, progress);
+        progressLine.SetPosition(1, midpoint);
+    }
+
+    // Remember that this is also used in LevelMenuManager.cs!
+    public void StartAttack(Transform origin, Color color, int targetIntendedShape, float initialProgress = 0.0f) // Must be called after DrawBackgroundSegment
+    {
+        // We cannot attach multiple Renderers to the same object, so we spawn a new empty child object for the progress line
+        LineRenderer attack;
+        Transform destination;
+        float progress;
+        if (origin == leftPoint)
+        {
+            destination = rightPoint;
+            if (leftAttackLine == null) {
+                leftAttackLine = InitializeAttack(color, "Left Attack");
+                leftAttackProgress = initialProgress; // This is mainly so in the level menu, the attack immediately shows as completed
+            }
+            leftAttackShape = targetIntendedShape; // This allows changing shape on an already started attack... might want to revisit
+            attack = leftAttackLine;
+            progress = leftAttackProgress;
+        }
+        else if (origin == rightPoint)
+        {
+            destination = leftPoint;
+            if (rightAttackLine == null) {
+                rightAttackLine = InitializeAttack(color, "Right Attack");
+                rightAttackProgress = initialProgress;
+            }
+            rightAttackShape = targetIntendedShape;
+            attack = rightAttackLine;
+            progress = rightAttackProgress;
+        }
+        else
+        {
+            Debug.LogError("Error: LineController.StartAttack() called with a transform that is not a start or end point");
+            return;
+        }
+
         // point between the two nodes, used as the control point for the progress line
-        Vector3 midpoint = Vector3.Lerp(origin.position, destination.position, initialProgress);
+        Vector3 midpoint = Vector3.Lerp(origin.position, destination.position, progress);
+        attack.SetPosition(0, origin.position);
+        attack.SetPosition(1, midpoint);
 
-        progress.material = new Material(Shader.Find("Sprites/Default"));
-        progress.positionCount = 2;
-        progress.SetPosition(0, origin.position);
-        progress.SetPosition(1, midpoint);
-        progress.startWidth = backgroundLine.startWidth * 2;
-        progress.endWidth = backgroundLine.endWidth * 2;
+        // Start the coroutine to animate the attacks
+        active = true;
+        if (gameController != null) { // if it is null, we should be in the level menu
+            StartCoroutine(UpdateAttacks());
+        }
+    }
 
-        // Set the sorting layer for the progress line renderer: we want it in the Lines layer, but in front of the background line
-        progress.sortingLayerName = "Lines";
+    IEnumerator UpdateAttacks(float speed = 0.5f) {
+        while (active) {
+            if (leftAttackLine != null)
+            {
+                leftAttackProgress += speed * Time.deltaTime;
+                UpdateAttack(leftPoint, leftAttackProgress);
+            }
+            if (rightAttackLine != null)
+            {
+                rightAttackProgress += speed * Time.deltaTime;
+                UpdateAttack(rightPoint, rightAttackProgress);
+            }
+
+            if (leftAttackProgress >= 1.0f) {
+                gameController.UpdateOwnership(rightPoint.gameObject, gameController.GetNodeOwnership(leftPoint.gameObject), leftAttackShape);
+                Debug.Log("Updated target shape to " + leftAttackShape);
+                active = false;
+            }
+            if (rightAttackProgress >= 1.0f) {
+                gameController.UpdateOwnership(leftPoint.gameObject, gameController.GetNodeOwnership(rightPoint.gameObject), rightAttackShape);
+                Debug.Log("Updated target shape to " + rightAttackShape);
+                active = false;
+            }
+            yield return null;
+        }
+    }
+
+    // This function should do everything necessary to start a new attack except setting the position
+    private LineRenderer InitializeAttack(Color color, string name) {
+        LineRenderer result = new GameObject().AddComponent<LineRenderer>();
+        result.gameObject.transform.SetParent(transform, false);
+        result.gameObject.transform.SetPositionAndRotation(transform.position, transform.rotation);
+        result.gameObject.name = name;
+        result.sortingLayerName = "Lines";
+        result.sortingOrder = 1;
+
+        // materials
+        result.material = new Material(Shader.Find("Sprites/Default"));
+        result.positionCount = 2;
+        result.startWidth = backgroundLine.startWidth * 2;
+        result.endWidth = backgroundLine.endWidth * 2;
 
         // Set the progress color from the input parameter
         GradientColorKey[] colorKey = new GradientColorKey[2];
@@ -102,7 +165,8 @@ public class LineController : MonoBehaviour
         alphaKey[1].time = 1.0f;
         Gradient gradient = new Gradient();
         gradient.SetKeys(colorKey, alphaKey);
-        progress.colorGradient = gradient;
+        result.colorGradient = gradient;
+        return result;
     }
 
     // Update is called once per frame

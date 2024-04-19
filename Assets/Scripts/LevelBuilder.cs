@@ -20,7 +20,7 @@ public class LevelBuilder : MonoBehaviour
     // It could stand a little method extraction
     void Start()
     {
-        Debug.Log("Level Builder Start");
+        // Debug.Log("Level Builder Start");
         // Get the LevelElements object to parent the nodes to
         GameObject levelElements = GameObject.Find("Level Elements"); // maybe handle error if object missing
         // Get the level data

@@ -38,8 +38,8 @@ public class GameController : MonoBehaviour
         {
             nodeOwnership[i] = 0;
         }
-        Debug.Log("Nodes and Lines set");
-        Debug.Log("Nodes: " + nodes.Length);
+        // Debug.Log("Nodes and Lines set");
+        // Debug.Log("Nodes: " + nodes.Length);
     }
 
     // for use by node controller
@@ -115,7 +115,8 @@ public class GameController : MonoBehaviour
         Debug.Log("Initiating attack");
         // Implement attack logic here
         LineController lineController = levelBuilder.GetConnectionController(selectedNode, targetNode);
-        lineController.StartAttack(selectedNode.transform, Color.red, targetNode.GetComponent<NodeController>().GetShape());
+        lineController.StartAttack(selectedNode.transform, Color.red, targetNode.GetComponent<NodeController>().GetTransientShape());
+        Debug.Log("Attack initiated, hoping for shape " + targetNode.GetComponent<NodeController>().GetTransientShape());
     }
 
     private void launchAttack(GameObject node){
@@ -144,6 +145,12 @@ public class GameController : MonoBehaviour
             }
         }
         targetNeighbors = tmpNeighbors.ToArray();
+    }
+
+    public int GetNodeOwnership(GameObject node)
+    {
+        int nodeIndex = levelBuilder.NodeToIndex(node);
+        return nodeOwnership[nodeIndex];
     }
 
     // node - the node to be updated, player - the player who now owns the node 

@@ -89,6 +89,23 @@ public class NodeController : MonoBehaviour
         return -1;
     }
 
+    public int GetTransientShape(){
+        transientShape = GetComponent<SpriteRenderer>().sprite;
+        if (transientShape == circle){
+            return 0;
+        }
+        else if (transientShape == square){
+            return 1;
+        }
+        else if (transientShape == hexagon){
+            return 2;
+        }
+        else if (transientShape == triangle){
+            return 3;
+        }
+        return -1;
+    }
+
     public void changeColor(int color){
         _render = GetComponent<SpriteRenderer>();
         _render.color = playerColors[color];
