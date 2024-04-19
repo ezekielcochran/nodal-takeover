@@ -114,6 +114,8 @@ public class GameController : MonoBehaviour
     private void initiateAttack(){
         Debug.Log("Initiating attack");
         // Implement attack logic here
+        LineController lineController = levelBuilder.GetConnectionController(selectedNode, targetNode);
+        lineController.StartAttack(selectedNode.transform, Color.red, targetNode.GetComponent<NodeController>().GetShape());
     }
 
     private void launchAttack(GameObject node){

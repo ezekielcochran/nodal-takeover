@@ -73,6 +73,22 @@ public class NodeController : MonoBehaviour
         _render.sprite = actualShape;
     }
 
+    public int GetShape(){
+        if (actualShape == circle){
+            return 0;
+        }
+        else if (actualShape == square){
+            return 1;
+        }
+        else if (actualShape == hexagon){
+            return 2;
+        }
+        else if (actualShape == triangle){
+            return 3;
+        }
+        return -1;
+    }
+
     public void changeColor(int color){
         _render = GetComponent<SpriteRenderer>();
         _render.color = playerColors[color];

@@ -110,7 +110,7 @@ public class LevelBuilder : MonoBehaviour
     // This function reads the level data from a file into a struct, leaving values as in the file. For example, positions are left in viewport coordinates (from 0 to 1)
     // However, nodes are 0-based in the array, so they must be decremented by 1 when used as indices
     // Also, stream reader may not work for android builds, so this may need to be changed
-    LevelData GetLevelData(int level)
+    private LevelData GetLevelData(int level)
     {
         // Application.dataPath points to the Assets folder in unity play mode, and Contents within the .app bundle in a build for mac
         // string filePath = Application.dataPath + "/Resources/LevelData/level" + level + ".txt"; // hard path: Don't move stuff!

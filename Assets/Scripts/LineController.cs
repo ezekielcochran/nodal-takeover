@@ -8,51 +8,49 @@ public class LineController : MonoBehaviour
 {
     // These are the line renderers for the preexisting connection, left progress, and right progress lines
     // Note that "left" and "right" correspond to the order in which the nodes were connected in the level data file... this only corresponds to actual left and right if the lower index node is left of the higher
-    private LineRenderer backgroundLine, leftProgressLine, rightProgressLine;
-    // start and end do NOT change: they are the start and end points of the background line in increasing node index order
+    private LineRenderer backgroundLine, leftAttackLine, rightAttackLine;
+    // leftPoint and rightPoint do NOT change: they are the start and end points of the background line in increasing node index order
     // Some methods use origin and destination: thsese depend on which node is attacking
-    private Transform start, end;
+    private Transform leftPoint, rightPoint;
 
-    // just for colored lines to show up on top of each other for prototype: NOT THOUGHT OUT, NOT FINAL
-    private static int prototypeTempSortingOrder = 1;
     // Start is called before the first frame update
     void Start() {}
 
     public void DrawBackgroundSegment(Transform start, Transform end)
     {
-        this.start = start;
-        this.end = end;
+        this.leftPoint = start;
+        this.rightPoint = end;
         backgroundLine = GetComponent<LineRenderer>(); // Moving the initialization to Start() doesn't work... seems that new instances don't get their Start() methods called
         backgroundLine.positionCount = 2;
         backgroundLine.SetPosition(0, start.position);
         backgroundLine.SetPosition(1, end.position);
     }
 
-    public void UpdateAttack(Transform origin, float progress) // Must be called after StartAttack is called with the same origin
-    {
-        LineRenderer progressLine;
-        Transform destination;
-        if (origin == start)
-        {
-            destination = end;
-            progressLine = leftProgressLine;
-        }
-        else if (origin == end)
-        {
-            destination = start;
-            progressLine = rightProgressLine;
-        }
-        else
-        {
-            Debug.LogError("Error: LineController.Embark() called with a transform that is not a start or end point");
-            return;
-        }
+    // public void UpdateAttack(Transform origin, float progress) // Must be called after StartAttack is called with the same origin
+    // {
+    //     LineRenderer progressLine;
+    //     Transform destination;
+    //     if (origin == leftPoint)
+    //     {
+    //         destination = rightPoint;
+    //         progressLine = leftAttackLine;
+    //     }
+    //     else if (origin == rightPoint)
+    //     {
+    //         destination = leftPoint;
+    //         progressLine = rightAttackLine;
+    //     }
+    //     else
+    //     {
+    //         Debug.LogError("Error: LineController.Embark() called with a transform that is not a start or end point");
+    //         return;
+    //     }
 
-        Vector3 midpoint = Vector3.Lerp(origin.position, destination.position, progress);
-        progressLine.SetPosition(1, midpoint);
-    }
+    //     Vector3 midpoint = Vector3.Lerp(origin.position, destination.position, progress);
+    //     progressLine.SetPosition(1, midpoint);
+    // }
 
-    public void StartAttack(Transform origin, Color color, float initialProgress = 0.0f) // Must be called after DrawBackgroundSegment
+    public void StartAttack(Transform origin, Color color, int shape, float initialProgress = 0.0f) // Must be called after DrawBackgroundSegment
     {
         // We cannot attach multiple Renderers to the same object, so we spawn a new empty child object for the progress line
         LineRenderer progress = new GameObject().AddComponent<LineRenderer>();
@@ -60,17 +58,17 @@ public class LineController : MonoBehaviour
         progress.gameObject.transform.SetPositionAndRotation(transform.position, transform.rotation);
 
         Transform destination;
-        if (origin == start)
+        if (origin == leftPoint)
         {
-            destination = end;
+            destination = rightPoint;
             progress.gameObject.name = "Left Attack";
-            leftProgressLine = progress;
+            leftAttackLine = progress;
         }
-        else if (origin == end)
+        else if (origin == rightPoint)
         {
-            destination = start;
+            destination = leftPoint;
             progress.gameObject.name = "Right Attack";
-            rightProgressLine = progress;
+            rightAttackLine = progress;
         }
         else
         {
@@ -90,9 +88,6 @@ public class LineController : MonoBehaviour
 
         // Set the sorting layer for the progress line renderer: we want it in the Lines layer, but in front of the background line
         progress.sortingLayerName = "Lines";
-        // progress.sortingOrder = backgroundLine.sortingOrder + 1;
-        prototypeTempSortingOrder++;
-        progress.sortingOrder = prototypeTempSortingOrder;
 
         // Set the progress color from the input parameter
         GradientColorKey[] colorKey = new GradientColorKey[2];
