@@ -29,6 +29,15 @@ public class GameController : MonoBehaviour
         background = GameObject.Find("Background");
     }
 
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.A)) {
+            GameObject testEnemyNode = nodes[nodes.Length - 1];
+            GameObject[] neighbors = levelBuilder.FindNeighbors(testEnemyNode);
+            LineController testLine = levelBuilder.GetConnectionController(testEnemyNode, neighbors[0]);
+            testLine.StartAttack(testEnemyNode.transform, Color.blue, testEnemyNode.GetComponent<NodeController>().GetShape());
+        }
+    }
+
     public void SetNodesLines(GameObject[] nodes, GameObject[,] connectionLines)
     {
         this.nodes = nodes;
@@ -112,11 +121,8 @@ public class GameController : MonoBehaviour
     // Helper functions for handling node clicks//
 
     private void initiateAttack(){
-        Debug.Log("Initiating attack");
-        // Implement attack logic here
         LineController lineController = levelBuilder.GetConnectionController(selectedNode, targetNode);
-        lineController.StartAttack(selectedNode.transform, Color.red, targetNode.GetComponent<NodeController>().GetTransientShape());
-        Debug.Log("Attack initiated, hoping for shape " + targetNode.GetComponent<NodeController>().GetTransientShape());
+        lineController.StartAttack(selectedNode.transform, selectedNode.GetComponent<NodeController>().GetColor(), targetNode.GetComponent<NodeController>().GetTransientShape());
     }
 
     private void launchAttack(GameObject node){
@@ -172,6 +178,8 @@ public class GameController : MonoBehaviour
         nodeOwnership[nodeIndex] = player;
         node.GetComponent<NodeController>().changeColor(player);
         node.GetComponent<NodeController>().setShape(shape);
+        // Debug.Log("In Game Controller, node " + nodeIndex + " is now owned by player " + player + " with shape " + shape);
+        // Debug.Log("And node " + nodeIndex + " is reporting shape " + node.GetComponent<NodeController>().GetShape());
 
         // want to remove all 
     }

@@ -22,6 +22,12 @@ public class NodeController : MonoBehaviour
         // Global Variable which toggles based off whether a node is  being toggled or not
         isPulsing = false;
         gameController = GameObject.Find("Game Controller").GetComponent<GameController>();
+
+        // setting these here causes a race condition with LevelBuilder's start, which initializes starting nodes for each player
+        if (actualShape != null) {
+            transientShape = actualShape;
+            return;
+        }
         transientShape = circle;
         actualShape = circle;
     }
@@ -106,6 +112,11 @@ public class NodeController : MonoBehaviour
         return -1;
     }
 
+    public Color GetColor(){
+        // Do i need to re-get the renderer every time?
+        _render = GetComponent<SpriteRenderer>();
+        return _render.color;
+    }
     public void changeColor(int color){
         _render = GetComponent<SpriteRenderer>();
         _render.color = playerColors[color];

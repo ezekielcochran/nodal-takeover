@@ -17,6 +17,7 @@ public class LineController : MonoBehaviour
     private bool leftActive = false;
     private bool rightActive = false;
     private GameController gameController;
+    private const float DEFAULT_SPEED = 0.5f;
 
     // Start is called before the first frame update
     void Start() {
@@ -67,6 +68,12 @@ public class LineController : MonoBehaviour
     // Remember that this is also used in LevelMenuManager.cs!
     public void StartAttack(Transform origin, Color color, int targetIntendedShape, float initialProgress = 0.0f) // Must be called after DrawBackgroundSegment
     {
+        // relying on short-circuit boolean evaluation here for the level menu
+        if ((gameController != null) && (gameController.GetNodeOwnership(leftPoint.gameObject) == gameController.GetNodeOwnership(rightPoint.gameObject))) {
+            Debug.LogError("Error: LineController.StartAttack() called between two nodes owned by the same player ");
+            return;
+        }
+
         // We cannot attach multiple Renderers to the same object, so we spawn a new empty child object for the progress line
         LineRenderer attack;
         Transform destination;
@@ -161,7 +168,7 @@ public class LineController : MonoBehaviour
         PruneFinishedAttacks();
     }
 
-    IEnumerator UpdateAttacks(float speed = 0.5f) {
+    IEnumerator UpdateAttacks(float speed = DEFAULT_SPEED) {
         while (leftActive || rightActive) {
             if (leftAttackLine != null)
             {
