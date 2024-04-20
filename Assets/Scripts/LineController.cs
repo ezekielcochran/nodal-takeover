@@ -70,7 +70,7 @@ public class LineController : MonoBehaviour
     {
         // relying on short-circuit boolean evaluation here for the level menu
         if ((gameController != null) && (gameController.GetNodeOwnership(leftPoint.gameObject) == gameController.GetNodeOwnership(rightPoint.gameObject))) {
-            Debug.LogError("Error: LineController.StartAttack() called between two nodes owned by the same player ");
+            Debug.LogError("Error: Friendly Fire! LineController.StartAttack() called between two nodes owned by the same player ");
             return;
         }
 
