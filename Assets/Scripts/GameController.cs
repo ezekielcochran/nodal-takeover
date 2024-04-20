@@ -23,6 +23,11 @@ public class GameController : MonoBehaviour
     // targetOriginalShape is the actual shape of the target node 
     private Sprite targetOriginalShape;
 
+    //which player won
+    private int winner = 0;
+
+    //number of current attacks for each player
+    private int[] attacks; 
 
     void Start(){
         levelBuilder = GameObject.Find("Level Elements").GetComponent<LevelBuilder>();
@@ -57,7 +62,7 @@ public class GameController : MonoBehaviour
     {
 
         if (selectedNode == null){
-            if (IsOwned(node)){
+            if (IsOwned(node, 1)){
                 selectedNode = node;
                 updateTargetNeighbors();
                 pulseAll();
@@ -72,7 +77,7 @@ public class GameController : MonoBehaviour
                     pulseAll();
                     selectedNode = null;
                     targetNeighbors = null;
-                } else if (IsOwned(node)){
+                } else if (IsOwned(node, 1)){
                     pulseAll();
                     selectedNode = node;
                     updateTargetNeighbors();
@@ -98,7 +103,7 @@ public class GameController : MonoBehaviour
                     selectedNode = null;
                     targetNeighbors = null;
                     targetOriginalShape = null;
-                } else if (IsOwned(node)){ // If the player clicks another node that they own, start the attack and then change the selected node
+                } else if (IsOwned(node, 1)){ // If the player clicks another node that they own, start the attack and then change the selected node
                     initiateAttack();
                     pulseAll();
                     resetTargetShape();
@@ -146,7 +151,7 @@ public class GameController : MonoBehaviour
         List<GameObject> tmpNeighbors = new List<GameObject>();
         GameObject[] neighbors = levelBuilder.FindNeighbors(selectedNode);
         for (int i = 0; i < neighbors.Length; i++){
-            if (!IsOwned(neighbors[i])){
+            if (!IsOwned(neighbors[i], 1)){
                 tmpNeighbors.Add(neighbors[i]);
             }
         }
@@ -184,11 +189,49 @@ public class GameController : MonoBehaviour
         // want to remove all 
     }
 
-    private bool IsOwned(GameObject node){
+    private bool IsOwned(GameObject node, int playerNumber){
         if (node == background) {
             return false; 
         }
         int nodeIndex = levelBuilder.NodeToIndex(node);
-        return nodeOwnership[nodeIndex] == 1; 
+        return nodeOwnership[nodeIndex] == playerNumber; 
+    }
+
+
+    IEnumerator StartComputerPlayer(int playerNumber, int maxAttacks) {
+        GameObject node;
+        List<GameObject> tmpNeighbors = new List<GameObject>();
+        GameObject[] neighbors; 
+
+        int nodeIndex = 0;
+        while (winner != 0) {
+            //if we can do another attack
+            if (attacks[playerNumber] < maxAttacks) {
+                //iterate over the nodes and find one that can attack
+                for (nodeIndex = 0; nodeIndex < nodes.Length; nodeIndex++) {
+                    //if it is owned by this cpu
+                    if(nodeOwnership[nodeIndex] == playerNumber) {
+                        node = nodes[nodeIndex];
+                    }
+                    else node = null;
+                    if (node.GetComponent<NodeController>().isAttacking == false) {
+                        neighbors = levelBuilder.FindNeighbors(node);
+                        for (int i = 0; i < neighbors.Length; i++){
+                            if (!IsOwned(neighbors[i], playerNumber)){
+                                tmpNeighbors.Add(neighbors[i]);
+                            }
+                        }
+
+                        //attack random neighbor
+                        //increment attack count and find a new node that can attack
+                        attacks[playerNumber] = attacks[playerNumber]+1;
+                        break;
+                    }
+                    
+                }
+                
+            }
+        }
+        yield return null;
     }
 }
