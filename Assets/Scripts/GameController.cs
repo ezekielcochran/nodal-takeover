@@ -153,13 +153,27 @@ public class GameController : MonoBehaviour
         return nodeOwnership[nodeIndex];
     }
 
+    // This function needs to not only update the ownership of the node, but also clear all other outgoing attack lines, and any completed incoming ones
+    public void ReportConquer(GameObject source, GameObject target, int shape){
+        updateOwnership(target, GetNodeOwnership(source), shape);
+        GameObject[] neighbors = levelBuilder.FindNeighbors(target);
+        for (int i = 0; i < neighbors.Length; i++){
+            if (neighbors[i] != source) {
+                LineController lineController = levelBuilder.GetConnectionController(target, neighbors[i]);
+                lineController.StopAttackCleanConnections(target.transform);
+            }
+        }
+    }
+
     // node - the node to be updated, player - the player who now owns the node 
-    public void UpdateOwnership(GameObject node, int player, int shape)
+    public void updateOwnership(GameObject node, int player, int shape)
     {
         int nodeIndex = levelBuilder.NodeToIndex(node);
         nodeOwnership[nodeIndex] = player;
         node.GetComponent<NodeController>().changeColor(player);
         node.GetComponent<NodeController>().setShape(shape);
+
+        // want to remove all 
     }
 
     private bool IsOwned(GameObject node){

@@ -14,7 +14,8 @@ public class LineController : MonoBehaviour
     private Transform leftPoint, rightPoint;
     private int leftAttackShape, rightAttackShape;
     private float leftAttackProgress, rightAttackProgress;
-    private bool active = false;
+    private bool leftActive = false;
+    private bool rightActive = false;
     private GameController gameController;
 
     // Start is called before the first frame update
@@ -80,6 +81,7 @@ public class LineController : MonoBehaviour
             leftAttackShape = targetIntendedShape; // This allows changing shape on an already started attack... might want to revisit
             attack = leftAttackLine;
             progress = leftAttackProgress;
+            leftActive = true;
         }
         else if (origin == rightPoint)
         {
@@ -91,6 +93,7 @@ public class LineController : MonoBehaviour
             rightAttackShape = targetIntendedShape;
             attack = rightAttackLine;
             progress = rightAttackProgress;
+            rightActive = true;
         }
         else
         {
@@ -104,14 +107,62 @@ public class LineController : MonoBehaviour
         attack.SetPosition(1, midpoint);
 
         // Start the coroutine to animate the attacks
-        active = true;
         if (gameController != null) { // if it is null, we should be in the level menu
             StartCoroutine(UpdateAttacks());
         }
     }
 
+    public void StopAttack(Transform origin)
+    {
+        if (origin == leftPoint)
+        {
+            if (leftAttackLine == null) {
+                return;
+            }
+            Destroy(leftAttackLine.gameObject);
+            leftAttackLine = null;
+            leftAttackProgress = 0.0f;
+            leftAttackShape = 0;
+            leftActive = false;
+        }
+        else if (origin == rightPoint)
+        {
+            if (rightAttackLine == null) {
+                return;
+            }
+            Destroy(rightAttackLine.gameObject);
+            rightAttackLine = null;
+            rightAttackProgress = 0.0f;
+            rightAttackShape = 0;
+            rightActive = false;
+        }
+        else
+        {
+            Debug.LogError("Error: LineController.StopAttack() called with a transform that is not a start or end point");
+        }
+    }
+
+    private void PruneFinishedAttacks()
+    {
+        if (leftAttackLine != null && leftAttackProgress >= 1.0f)
+        {
+            StopAttack(leftPoint);
+        }
+        if (rightAttackLine != null && rightAttackProgress >= 1.0f)
+        {
+            StopAttack(rightPoint);
+        }
+    }
+
+    // game controller should call this function on every connection of a newly captured node, except the incoming "victorious" connection
+    public void StopAttackCleanConnections(Transform origin)
+    {
+        StopAttack(origin);
+        PruneFinishedAttacks();
+    }
+
     IEnumerator UpdateAttacks(float speed = 0.5f) {
-        while (active) {
+        while (leftActive || rightActive) {
             if (leftAttackLine != null)
             {
                 leftAttackProgress += speed * Time.deltaTime;
@@ -124,14 +175,16 @@ public class LineController : MonoBehaviour
             }
 
             if (leftAttackProgress >= 1.0f) {
-                gameController.UpdateOwnership(rightPoint.gameObject, gameController.GetNodeOwnership(leftPoint.gameObject), leftAttackShape);
-                Debug.Log("Updated target shape to " + leftAttackShape);
-                active = false;
+                gameController.ReportConquer(leftPoint.gameObject, rightPoint.gameObject, leftAttackShape);
+                leftActive = false;
+                rightActive = false;
+                StopAttack(rightPoint);
             }
             if (rightAttackProgress >= 1.0f) {
-                gameController.UpdateOwnership(leftPoint.gameObject, gameController.GetNodeOwnership(rightPoint.gameObject), rightAttackShape);
-                Debug.Log("Updated target shape to " + rightAttackShape);
-                active = false;
+                gameController.ReportConquer(rightPoint.gameObject, leftPoint.gameObject, rightAttackShape);
+                leftActive = false;
+                rightActive = false;
+                StopAttack(leftPoint);
             }
             yield return null;
         }
