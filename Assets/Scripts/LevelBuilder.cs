@@ -61,6 +61,9 @@ public class LevelBuilder : MonoBehaviour
         // Assign the start nodes for player and computer
         gameController.updateOwnership(nodes[0], 1, 1);
         gameController.updateOwnership(nodes[levelData.nodeCount - 1], 2, 3);
+
+        //start computer players
+        gameController.StartComputerPlayer(2, 1);
     }
 
     // Return the LineController object that connects the two input nodes
