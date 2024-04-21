@@ -16,8 +16,9 @@ public class LineController : MonoBehaviour
     private float leftAttackProgress, rightAttackProgress;
     private bool leftActive = false;
     private bool rightActive = false;
+    private bool coroutineRunning = false;
     private GameController gameController;
-    private const float DEFAULT_SPEED = 0.5f;
+    private const float DEFAULT_SPEED = 0.1f;
 
     // Start is called before the first frame update
     void Start() {
@@ -114,7 +115,9 @@ public class LineController : MonoBehaviour
         attack.SetPosition(1, midpoint);
 
         // Start the coroutine to animate the attacks
-        if (gameController != null) { // if it is null, we should be in the level menu
+        // Do NOT start the coroutine for the RIGHT attack if it is already going for the LEFT! (or vice versa, point is two copies running causes lines to double speed)
+        if (gameController != null && coroutineRunning == false) { // if it is null, we should be in the level menu
+            coroutineRunning = true;
             StartCoroutine(UpdateAttacks());
         }
     }
@@ -168,19 +171,63 @@ public class LineController : MonoBehaviour
         PruneFinishedAttacks();
     }
 
+    // This function needs to only be called ONCE per frame, so that the progress of the attacks is consistent
     IEnumerator UpdateAttacks(float speed = DEFAULT_SPEED) {
         while (leftActive || rightActive) {
-            if (leftAttackLine != null)
+            float dx = speed * Time.deltaTime;
+            // If either attack is active, it should have a line
+            Debug.Assert(leftAttackLine != null || rightAttackLine != null, "Error: LineController.UpdateAttacks() called with no active attacks");
+
+            // only the left is attacking
+            if (rightAttackLine == null)
             {
-                leftAttackProgress += speed * Time.deltaTime;
+                leftAttackProgress += dx;
                 UpdateAttack(leftPoint, leftAttackProgress);
             }
-            if (rightAttackLine != null)
+            // only the right is attacking
+            else if (leftAttackLine == null)
             {
-                rightAttackProgress += speed * Time.deltaTime;
+                rightAttackProgress += dx;
+                UpdateAttack(rightPoint, rightAttackProgress);
+            }
+            // both are attacking
+            else
+            {
+                Debug.Assert(leftAttackLine != null && rightAttackLine != null, "Error: LineController.UpdateAttacks() called with both attacks active but no line renderers");
+                leftAttackProgress += dx;
+                rightAttackProgress += dx;
+                // The attacks have collided
+                if (leftAttackProgress + rightAttackProgress >= 1)
+                {
+                    Debug.Log("Collision! Left Shape: " + leftAttackShape + ", Right Shape: " + rightAttackShape + ", Left Progress: " + leftAttackProgress + ", Right Progress: " + rightAttackProgress );
+                    // They have the same shape
+                    if (BeatsShape(leftAttackShape, rightAttackShape) == 0)
+                    {
+                        // So they are in deadlock, and each eats half the extra
+                        float overflow = leftAttackProgress + rightAttackProgress - 1;
+                        leftAttackProgress -= overflow / 2;
+                        rightAttackProgress -= overflow / 2;
+                    }
+                    // Left shape wins, so right atack is pushed back
+                    else if (BeatsShape(leftAttackShape, rightAttackShape) == 1)
+                    {
+                        rightAttackProgress = 1 - leftAttackProgress;
+                    }
+                    // Right shape wins, so left attack is pushed back
+                    else if (BeatsShape(leftAttackShape, rightAttackShape) == -1)
+                    {
+                        leftAttackProgress = 1 - rightAttackProgress;
+                    }
+                    else
+                    {
+                        Debug.LogError("Error: LineController.UpdateAttacks() called with unknown return value from BeatsShape()");
+                    }
+                }
+                UpdateAttack(leftPoint, leftAttackProgress);
                 UpdateAttack(rightPoint, rightAttackProgress);
             }
 
+            // Did someone win?
             if (leftAttackProgress >= 1.0f) {
                 gameController.ReportConquer(leftPoint.gameObject, rightPoint.gameObject, leftAttackShape);
                 leftActive = false;
@@ -195,6 +242,25 @@ public class LineController : MonoBehaviour
             }
             yield return null;
         }
+        coroutineRunning = false;
+    }
+
+    private int BeatsShape(int firstShape, int secondShape) {
+        Debug.Assert(firstShape >= 1 && firstShape <= 3, "Error: LineController.BeatsShape() called with an unknown first shape: I only know shapes 1, 2, and 3");
+        Debug.Assert(secondShape >= 1 && secondShape <= 3, "Error: LineController.BeatsShape() called with an unknown second shape: I only know shapes 1, 2, and 3");
+        if (firstShape == secondShape) {
+            return 0;
+        }
+        if (firstShape == 1 && secondShape == 3) {
+            return 1;
+        }
+        if (firstShape == 2 && secondShape == 1) {
+            return 1;
+        }
+        if (firstShape == 3 && secondShape == 2) {
+            return 1;
+        }
+        return -1;
     }
 
     // This function should do everything necessary to start a new attack except setting the position
