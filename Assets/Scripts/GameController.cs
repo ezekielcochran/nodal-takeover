@@ -29,6 +29,15 @@ public class GameController : MonoBehaviour
         background = GameObject.Find("Background");
     }
 
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.A)) {
+            GameObject testEnemyNode = nodes[nodes.Length - 1];
+            GameObject[] neighbors = levelBuilder.FindNeighbors(testEnemyNode);
+            LineController testLine = levelBuilder.GetConnectionController(testEnemyNode, neighbors[0]);
+            testLine.StartAttack(testEnemyNode.transform, Color.blue, testEnemyNode.GetComponent<NodeController>().GetShape());
+        }
+    }
+
     public void SetNodesLines(GameObject[] nodes, GameObject[,] connectionLines)
     {
         this.nodes = nodes;
@@ -38,8 +47,8 @@ public class GameController : MonoBehaviour
         {
             nodeOwnership[i] = 0;
         }
-        Debug.Log("Nodes and Lines set");
-        Debug.Log("Nodes: " + nodes.Length);
+        // Debug.Log("Nodes and Lines set");
+        // Debug.Log("Nodes: " + nodes.Length);
     }
 
     // for use by node controller
@@ -112,8 +121,8 @@ public class GameController : MonoBehaviour
     // Helper functions for handling node clicks//
 
     private void initiateAttack(){
-        Debug.Log("Initiating attack");
-        // Implement attack logic here
+        LineController lineController = levelBuilder.GetConnectionController(selectedNode, targetNode);
+        lineController.StartAttack(selectedNode.transform, selectedNode.GetComponent<NodeController>().GetColor(), targetNode.GetComponent<NodeController>().GetTransientShape());
     }
 
     private void launchAttack(GameObject node){
@@ -144,13 +153,35 @@ public class GameController : MonoBehaviour
         targetNeighbors = tmpNeighbors.ToArray();
     }
 
+    public int GetNodeOwnership(GameObject node)
+    {
+        int nodeIndex = levelBuilder.NodeToIndex(node);
+        return nodeOwnership[nodeIndex];
+    }
+
+    // This function needs to not only update the ownership of the node, but also clear all other outgoing attack lines, and any completed incoming ones
+    public void ReportConquer(GameObject source, GameObject target, int shape){
+        updateOwnership(target, GetNodeOwnership(source), shape);
+        GameObject[] neighbors = levelBuilder.FindNeighbors(target);
+        for (int i = 0; i < neighbors.Length; i++){
+            if (neighbors[i] != source) {
+                LineController lineController = levelBuilder.GetConnectionController(target, neighbors[i]);
+                lineController.StopAttackCleanConnections(target.transform);
+            }
+        }
+    }
+
     // node - the node to be updated, player - the player who now owns the node 
-    public void UpdateOwnership(GameObject node, int player, int shape)
+    public void updateOwnership(GameObject node, int player, int shape)
     {
         int nodeIndex = levelBuilder.NodeToIndex(node);
         nodeOwnership[nodeIndex] = player;
         node.GetComponent<NodeController>().changeColor(player);
         node.GetComponent<NodeController>().setShape(shape);
+        // Debug.Log("In Game Controller, node " + nodeIndex + " is now owned by player " + player + " with shape " + shape);
+        // Debug.Log("And node " + nodeIndex + " is reporting shape " + node.GetComponent<NodeController>().GetShape());
+
+        // want to remove all 
     }
 
     private bool IsOwned(GameObject node){

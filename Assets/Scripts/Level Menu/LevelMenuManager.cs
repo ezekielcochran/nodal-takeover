@@ -34,14 +34,14 @@ public class LevelMenuManager : MonoBehaviour
         for (int i = 0; i < levelsUnlocked - 1; i++) // - 1 to exclude the last level, + 1 to exclude the node for home button connection
         {
             levelNodes[i].GetComponent<SpriteRenderer>().color = Color.red;
-            connectionLines[i].GetComponent<LineController>().StartAttack(levelNodes[i].transform, Color.red, 1.0f);
+            connectionLines[i].GetComponent<LineController>().StartAttack(levelNodes[i].transform, Color.red, 0, 1.0f);
         }
         // This is the connection between the last unlocked level and the first locked level
         // So, we only color half of the attack
         levelNodes[levelsUnlocked - 1].GetComponent<SpriteRenderer>().color = Color.red;
         // If all of the levels are  unlocked, there is no "next level" to attack
         if (levelsUnlocked == levelNodes.Length) return;
-        connectionLines[levelsUnlocked - 1].GetComponent<LineController>().StartAttack(levelNodes[levelsUnlocked - 1].transform, Color.red, 0.5f);
+        connectionLines[levelsUnlocked - 1].GetComponent<LineController>().StartAttack(levelNodes[levelsUnlocked - 1].transform, Color.red, 0, 0.5f);
     }
 
     // Draw connections between level nodes

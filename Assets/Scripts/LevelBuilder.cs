@@ -20,7 +20,7 @@ public class LevelBuilder : MonoBehaviour
     // It could stand a little method extraction
     void Start()
     {
-        Debug.Log("Level Builder Start");
+        // Debug.Log("Level Builder Start");
         // Get the LevelElements object to parent the nodes to
         GameObject levelElements = GameObject.Find("Level Elements"); // maybe handle error if object missing
         // Get the level data
@@ -59,8 +59,8 @@ public class LevelBuilder : MonoBehaviour
         gameController.SetNodesLines(nodes, connectionLines);
 
         // Assign the start nodes for player and computer
-        gameController.UpdateOwnership(nodes[0], 1, 1);
-        gameController.UpdateOwnership(nodes[levelData.nodeCount - 1], 2, 2);
+        gameController.updateOwnership(nodes[0], 1, 1);
+        gameController.updateOwnership(nodes[levelData.nodeCount - 1], 2, 3);
     }
 
     // Return the LineController object that connects the two input nodes
@@ -110,7 +110,7 @@ public class LevelBuilder : MonoBehaviour
     // This function reads the level data from a file into a struct, leaving values as in the file. For example, positions are left in viewport coordinates (from 0 to 1)
     // However, nodes are 0-based in the array, so they must be decremented by 1 when used as indices
     // Also, stream reader may not work for android builds, so this may need to be changed
-    LevelData GetLevelData(int level)
+    private LevelData GetLevelData(int level)
     {
         // Application.dataPath points to the Assets folder in unity play mode, and Contents within the .app bundle in a build for mac
         // string filePath = Application.dataPath + "/Resources/LevelData/level" + level + ".txt"; // hard path: Don't move stuff!
