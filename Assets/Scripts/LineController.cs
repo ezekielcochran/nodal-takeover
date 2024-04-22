@@ -199,7 +199,7 @@ public class LineController : MonoBehaviour
                 // The attacks have collided
                 if (leftAttackProgress + rightAttackProgress >= 1)
                 {
-                    Debug.Log("Collision! Left Shape: " + leftAttackShape + ", Right Shape: " + rightAttackShape + ", Left Progress: " + leftAttackProgress + ", Right Progress: " + rightAttackProgress );
+                    //Debug.Log("Collision! Left Shape: " + leftAttackShape + ", Right Shape: " + rightAttackShape + ", Left Progress: " + leftAttackProgress + ", Right Progress: " + rightAttackProgress );
                     // They have the same shape
                     if (BeatsShape(leftAttackShape, rightAttackShape) == 0)
                     {

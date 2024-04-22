@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class NodeController : MonoBehaviour
 {
-    //can only attack one node at a time
-    public bool isAttacking = false;
 
     [SerializeField] private Sprite circle;
     [SerializeField] private Sprite square;
