@@ -10,6 +10,8 @@ Each line of each level's file corresponds to one of the following:
 | **nc** | Node Count | `int` | total number of nodes |
 | **n** | Node | `int float float` | node index, node x-coordinate, node y-coordinate |
 | **c** | Connection | `int int` | The indexes of two connected nodes, with the first smaller than the second |
+| **s** | Starting node | `int int int` | node index, initial onwer, initial shape, is cpu (0 or 1) |
+| **cpu** | Automate player | `int` | The player number that is to be a cpu |
 | **#** | Comment | `string` | comment line |
 
 How to format:
