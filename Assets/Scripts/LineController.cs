@@ -12,13 +12,13 @@ public class LineController : MonoBehaviour
     // leftPoint and rightPoint do NOT change: they are the start and end points of the background line in increasing node index order
     // Some methods use origin and destination: thsese depend on which node is attacking
     private Transform leftPoint, rightPoint;
-    private int leftAttackShape, rightAttackShape;
+    private int leftShape, rightShape, leftIntendedShape, rightIntendedShape;
     private float leftAttackProgress, rightAttackProgress;
     private bool leftActive = false;
     private bool rightActive = false;
     private bool coroutineRunning = false;
     private GameController gameController;
-    private const float DEFAULT_SPEED = 0.1f;
+    private const float DEFAULT_SPEED = 0.3f;
 
     // Start is called before the first frame update
     void Start() {
@@ -86,7 +86,13 @@ public class LineController : MonoBehaviour
                 leftAttackLine = InitializeAttack(color, "Left Attack");
                 leftAttackProgress = initialProgress; // This is mainly so in the level menu, the attack immediately shows as completed
             }
-            leftAttackShape = targetIntendedShape; // This allows changing shape on an already started attack... might want to revisit
+            // The bottom line is for comparing attacks based on the intended shape, not the actual shape
+            leftIntendedShape = targetIntendedShape; // This allows changing shape on an already started attack... might want to revisit
+            if (gameController != null) {
+                leftShape = origin.GetComponent<NodeController>().GetShape();
+            } else {
+                leftShape = 0; // another case when we check whether we are in the level menu
+            }
             attack = leftAttackLine;
             progress = leftAttackProgress;
             leftActive = true;
@@ -98,7 +104,13 @@ public class LineController : MonoBehaviour
                 rightAttackLine = InitializeAttack(color, "Right Attack");
                 rightAttackProgress = initialProgress;
             }
-            rightAttackShape = targetIntendedShape;
+            // again, the following commented line is for comparing attacks based on the intended shape, not the actual shape
+            rightIntendedShape = targetIntendedShape;
+            if (gameController != null) {
+                rightShape = origin.GetComponent<NodeController>().GetShape();
+            } else {
+                rightShape = 0; // another case when we check whether we are in the level menu
+            }
             attack = rightAttackLine;
             progress = rightAttackProgress;
             rightActive = true;
@@ -132,7 +144,7 @@ public class LineController : MonoBehaviour
             Destroy(leftAttackLine.gameObject);
             leftAttackLine = null;
             leftAttackProgress = 0.0f;
-            leftAttackShape = 0;
+            leftShape = 0;
             leftActive = false;
         }
         else if (origin == rightPoint)
@@ -143,7 +155,7 @@ public class LineController : MonoBehaviour
             Destroy(rightAttackLine.gameObject);
             rightAttackLine = null;
             rightAttackProgress = 0.0f;
-            rightAttackShape = 0;
+            rightShape = 0;
             rightActive = false;
         }
         else
@@ -199,9 +211,10 @@ public class LineController : MonoBehaviour
                 // The attacks have collided
                 if (leftAttackProgress + rightAttackProgress >= 1)
                 {
-                    //Debug.Log("Collision! Left Shape: " + leftAttackShape + ", Right Shape: " + rightAttackShape + ", Left Progress: " + leftAttackProgress + ", Right Progress: " + rightAttackProgress );
+                    // Debug.Log("Collision! Left Shape: " + leftShape + ", Right Shape: " + rightShape + ", Left Progress: " + leftAttackProgress + ", Right Progress: " + rightAttackProgress );
+
                     // They have the same shape
-                    if (BeatsShape(leftAttackShape, rightAttackShape) == 0)
+                    if (BeatsShape(leftShape, rightShape) == 0)
                     {
                         // So they are in deadlock, and each eats half the extra
                         float overflow = leftAttackProgress + rightAttackProgress - 1;
@@ -209,12 +222,12 @@ public class LineController : MonoBehaviour
                         rightAttackProgress -= overflow / 2;
                     }
                     // Left shape wins, so right atack is pushed back
-                    else if (BeatsShape(leftAttackShape, rightAttackShape) == 1)
+                    else if (BeatsShape(leftShape, rightShape) == 1)
                     {
                         rightAttackProgress = 1 - leftAttackProgress;
                     }
                     // Right shape wins, so left attack is pushed back
-                    else if (BeatsShape(leftAttackShape, rightAttackShape) == -1)
+                    else if (BeatsShape(leftShape, rightShape) == -1)
                     {
                         leftAttackProgress = 1 - rightAttackProgress;
                     }
@@ -229,13 +242,13 @@ public class LineController : MonoBehaviour
 
             // Did someone win?
             if (leftAttackProgress >= 1.0f) {
-                gameController.ReportConquer(leftPoint.gameObject, rightPoint.gameObject, leftAttackShape);
+                gameController.ReportConquer(leftPoint.gameObject, rightPoint.gameObject, leftIntendedShape);
                 leftActive = false;
                 rightActive = false;
                 StopAttack(rightPoint);
             }
             if (rightAttackProgress >= 1.0f) {
-                gameController.ReportConquer(rightPoint.gameObject, leftPoint.gameObject, rightAttackShape);
+                gameController.ReportConquer(rightPoint.gameObject, leftPoint.gameObject, rightIntendedShape);
                 leftActive = false;
                 rightActive = false;
                 StopAttack(leftPoint);
