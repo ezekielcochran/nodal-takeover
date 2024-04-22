@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class GameController : MonoBehaviour
 {
 
@@ -23,6 +22,11 @@ public class GameController : MonoBehaviour
     // targetOriginalShape is the actual shape of the target node 
     private Sprite targetOriginalShape;
 
+    //which player won
+    private int winner = -1;
+
+    //number of current attacks for each player
+    private int[] attacks = new int[5]; 
 
     void Start(){
         levelBuilder = GameObject.Find("Level Elements").GetComponent<LevelBuilder>();
@@ -57,7 +61,7 @@ public class GameController : MonoBehaviour
     {
 
         if (selectedNode == null){
-            if (IsOwned(node)){
+            if (IsOwned(node, 1)){
                 selectedNode = node;
                 updateTargetNeighbors();
                 pulseAll();
@@ -72,7 +76,7 @@ public class GameController : MonoBehaviour
                     pulseAll();
                     selectedNode = null;
                     targetNeighbors = null;
-                } else if (IsOwned(node)){
+                } else if (IsOwned(node, 1)){
                     pulseAll();
                     selectedNode = node;
                     updateTargetNeighbors();
@@ -98,7 +102,7 @@ public class GameController : MonoBehaviour
                     selectedNode = null;
                     targetNeighbors = null;
                     targetOriginalShape = null;
-                } else if (IsOwned(node)){ // If the player clicks another node that they own, start the attack and then change the selected node
+                } else if (IsOwned(node, 1)){ // If the player clicks another node that they own, start the attack and then change the selected node
                     initiateAttack();
                     pulseAll();
                     resetTargetShape();
@@ -146,7 +150,7 @@ public class GameController : MonoBehaviour
         List<GameObject> tmpNeighbors = new List<GameObject>();
         GameObject[] neighbors = levelBuilder.FindNeighbors(selectedNode);
         for (int i = 0; i < neighbors.Length; i++){
-            if (!IsOwned(neighbors[i])){
+            if (!IsOwned(neighbors[i], 1)){
                 tmpNeighbors.Add(neighbors[i]);
             }
         }
@@ -184,11 +188,74 @@ public class GameController : MonoBehaviour
         // want to remove all 
     }
 
-    private bool IsOwned(GameObject node){
+    private bool IsOwned(GameObject node, int playerNumber){
         if (node == background) {
             return false; 
         }
         int nodeIndex = levelBuilder.NodeToIndex(node);
-        return nodeOwnership[nodeIndex] == 1; 
+        return nodeOwnership[nodeIndex] == playerNumber; 
+    }
+
+    public void StartComputerPlayer(int playerNumber, int maxAttacks) {
+        StartCoroutine(computerPlayer(2, 3));
+    }
+
+    IEnumerator computerPlayer(int playerNumber, int maxAttacks) {
+        GameObject node = null;
+        GameObject targetNode = null;
+        List<GameObject> neighbors = new List<GameObject>(); 
+        List<GameObject> attackNodes = new List<GameObject>();
+        List<GameObject> tmpNeighbors = new List<GameObject>();
+        LineController testLine;
+        int ownedNodes = 1;
+        int nodeIndex = 0;
+        int nodeConquer = 0;
+        //var rnd = new Random();
+        //Debug.Log("Cpu Instantiated");
+
+        //as long as there is no winner
+        while (winner <= 0) {
+            node = null;
+            yield return null;
+            if (ownedNodes != nodeConquer) {
+                attacks[playerNumber]--;
+            }
+            nodeConquer = ownedNodes;
+            Debug.Log("Current attacks and max attacks" + attacks[playerNumber] + " " + maxAttacks);
+            //if we can do another attack
+            // if (attacks[playerNumber] < maxAttacks) {
+                ownedNodes = 0;
+                //iterate over the nodes and find one that can attack
+                attackNodes.Clear();
+                foreach (GameObject tmpNode in nodes) {
+                    //if it is owned by this cpu
+                    if(IsOwned(tmpNode, playerNumber)) {
+                        attackNodes.Add(tmpNode);
+                        ownedNodes++;
+                    }
+                    //Debug.Log("Number Nodes: " + ownedNodes + " in cpu");
+                }
+                node = attackNodes[Random.Range(0, attackNodes.Count-1)];
+                neighbors.Clear();
+                neighbors.AddRange(levelBuilder.FindNeighbors(node));
+                if (node != null && attacks[playerNumber] < maxAttacks) {
+                    tmpNeighbors.Clear();
+                    for (int i = 0; i < neighbors.Count; i++){
+                        if (!IsOwned(neighbors[i], playerNumber)){
+                            tmpNeighbors.Add(neighbors[i]);
+                        }
+                    }
+                    if (tmpNeighbors.Count != 0) {
+                        targetNode = tmpNeighbors[Random.Range(0, tmpNeighbors.Count-1)];
+                        //attack random neighbor
+                        testLine = levelBuilder.GetConnectionController(node, targetNode);
+                        testLine.StartAttack(node.transform, node.GetComponent<NodeController>().GetColor(), Random.Range(1,3));
+                        //increment attack count and reset the loop to find a new node that can attack
+                        attacks[playerNumber] = attacks[playerNumber]+1;
+                        // attacks[playerNumber]= ++;
+                    }
+                }
+            // }
+        }
     }
 }

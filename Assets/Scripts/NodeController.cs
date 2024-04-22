@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class NodeController : MonoBehaviour
 {
+
     [SerializeField] private Sprite circle;
     [SerializeField] private Sprite square;
     [SerializeField] private Sprite hexagon;
