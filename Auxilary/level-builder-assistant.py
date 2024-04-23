@@ -72,6 +72,9 @@ pygame.quit()
 
 click_positions.sort(key=lambda pos: pos[0])
 node_positions = [(click[0] / window_width, (window_height - click[1])/window_height) for click in click_positions]
+# Prune duplicates in connection_positions
+unique_connections = set(connection_positions)
+connection_positions = list(unique_connections)
 
 def connection_to_indices(connection):
     p1, p2, p3, p4 = connection
