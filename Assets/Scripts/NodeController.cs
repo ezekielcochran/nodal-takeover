@@ -120,7 +120,7 @@ public class NodeController : MonoBehaviour
     }
     public void changeColor(int color){
         _render = GetComponent<SpriteRenderer>();
-        _render.color = playerColors[color];
+        _render.color = playerColors[color%6];
     }
 
     public void activatePulse(){
