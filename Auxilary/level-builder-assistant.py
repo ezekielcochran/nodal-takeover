@@ -7,7 +7,7 @@ pygame.init()
 # Set the dimensions of the window
 window_width = 900
 window_height = 600
-CLICK_THRESHOLD = 2
+CLICK_THRESHOLD = 5
 
 # Create the window
 window = pygame.display.set_mode((window_width, window_height))
@@ -58,8 +58,9 @@ while running:
                 (p1, p2) = nearest_click((x, y))
                 (p3, p4) = nearest_click((x2, y2))
                 # Draw a line between the two positions
-                pygame.draw.line(window, (0, 0, 255), (p1, p2), (p3, p4), 2)
-                connection_positions.append((p1, p2, p3, p4))
+                if ((p1, p2) != (p3, p4)):
+                    pygame.draw.line(window, (0, 0, 255), (p1, p2), (p3, p4), 2)
+                    connection_positions.append((p1, p2, p3, p4))
                 # Update the display
                 pygame.display.flip()
                 
@@ -83,11 +84,12 @@ def connection_to_indices(connection):
     return i1, i2
 
 # print results
-print("")
+print(f"\nnc {len(node_positions)}\n")
 for node in node_positions:
     print(f"n {node_positions.index(node) + 1} {node[0]} {node[1]}")
 
 print("")
 for connection in connection_positions:
     i1, i2 = connection_to_indices(connection)
+    i1, i2 = sorted([i1, i2])
     print(f"c {i1 + 1} {i2 + 1}")

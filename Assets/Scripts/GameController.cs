@@ -204,7 +204,12 @@ public class GameController : MonoBehaviour
         // Note that this does NOT check whether the next level actually exists
         int levelsUnlocked = PlayerPrefs.GetInt("levelsUnlocked");
         if (winner == 1 && levelsUnlocked == levelBuilder.GetLevelNumber()){
+            Debug.Log("Updating levelsUnlocked to " + (levelsUnlocked + 1));
             PlayerPrefs.SetInt("levelsUnlocked", levelsUnlocked + 1);
+        }
+        else
+        {
+            Debug.Log("Levels Unlocked not affected.");
         }
     }
 
