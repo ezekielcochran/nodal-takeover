@@ -7,7 +7,7 @@ pygame.init()
 # Set the dimensions of the window
 window_width = 900
 window_height = 600
-CLICK_THRESHOLD = 5
+CLICK_THRESHOLD = 20
 
 # Create the window
 window = pygame.display.set_mode((window_width, window_height))
@@ -76,12 +76,14 @@ node_positions = [(click[0] / window_width, (window_height - click[1])/window_he
 # Prune duplicates in connection_positions
 unique_connections = set(connection_positions)
 connection_positions = list(unique_connections)
-
 def connection_to_indices(connection):
     p1, p2, p3, p4 = connection
     i1 = click_positions.index((p1, p2))
     i2 = click_positions.index((p3, p4))
     return i1, i2
+connections = [sorted(connection_to_indices(c)) for c in connection_positions]
+# this by default sorts by the first element of the tuple, then the second
+connections.sort()
 
 # print results
 print(f"\nnc {len(node_positions)}\n")
@@ -89,7 +91,5 @@ for node in node_positions:
     print(f"n {node_positions.index(node) + 1} {node[0]} {node[1]}")
 
 print("")
-for connection in connection_positions:
-    i1, i2 = connection_to_indices(connection)
-    i1, i2 = sorted([i1, i2])
-    print(f"c {i1 + 1} {i2 + 1}")
+for connection in connections:
+    print(f"c {connection[0] + 1} {connection[1] + 1}")
