@@ -65,15 +65,11 @@ public class LevelBuilder : MonoBehaviour
         }
 
         //start computer players
-<<<<<<< HEAD
-        gameController.StartComputerPlayer(3, 3);
-=======
         for (int i = 0; i < levelData.cpuPlayers.Length; i++)
         {
             gameController.StartComputerPlayer(levelData.cpuPlayers[i], 1);
         }
         // gameController.StartComputerPlayer(2, 1);
->>>>>>> f64c5cf3a7aa2d39992922addc4aad0952652f10
     }
 
     // Return the LineController object that connects the two input nodes

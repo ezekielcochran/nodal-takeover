@@ -31,6 +31,7 @@ public class GameController : MonoBehaviour
     void Start(){
         levelBuilder = GameObject.Find("Level Elements").GetComponent<LevelBuilder>();
         background = GameObject.Find("Background");
+        Random.seed = (int)Time.deltaTime;
     }
 
     void Update() {
@@ -166,13 +167,18 @@ public class GameController : MonoBehaviour
     // This function needs to not only update the ownership of the node, but also clear all other outgoing attack lines, and any completed incoming ones
     public void ReportConquer(GameObject source, GameObject target, int shape){
         updateOwnership(target, GetNodeOwnership(source), shape);
+        //tell the ai/player that it has 1 more attack now that it succeeded
+        attacks[GetNodeOwnership(source)]--;
         GameObject[] neighbors = levelBuilder.FindNeighbors(target);
         for (int i = 0; i < neighbors.Length; i++){
             if (neighbors[i] != source) {
                 LineController lineController = levelBuilder.GetConnectionController(target, neighbors[i]);
                 lineController.StopAttackCleanConnections(target.transform);
+                
             }
         }
+        //if the node that just got taken over was attacking decrement attacks from that player
+        //if (target.wasAttacking) {attacks[GetNodeOwnership(target)]--;}
     }
 
     // node - the node to be updated, player - the player who now owns the node 
@@ -208,7 +214,7 @@ public class GameController : MonoBehaviour
         List<GameObject> tmpNeighbors = new List<GameObject>();
         LineController testLine;
         int ownedNodes = 1;
-        int nodeIndex = 0;
+        //int nodeIndex = 0;
         int nodeConquer = 0;
         //var rnd = new Random();
         //Debug.Log("Cpu Instantiated");
@@ -217,13 +223,9 @@ public class GameController : MonoBehaviour
         while (winner <= 0) {
             node = null;
             yield return null;
-            if (ownedNodes != nodeConquer) {
-                attacks[playerNumber]--;
-            }
-            nodeConquer = ownedNodes;
             Debug.Log("Current attacks and max attacks" + attacks[playerNumber] + " " + maxAttacks);
             //if we can do another attack
-            // if (attacks[playerNumber] < maxAttacks) {
+            if (attacks[playerNumber] < maxAttacks) {
                 ownedNodes = 0;
                 //iterate over the nodes and find one that can attack
                 attackNodes.Clear();
@@ -235,7 +237,7 @@ public class GameController : MonoBehaviour
                     }
                     //Debug.Log("Number Nodes: " + ownedNodes + " in cpu");
                 }
-                node = attackNodes[Random.Range(0, attackNodes.Count-1)];
+                node = attackNodes[Random.Range(0, attackNodes.Count)];
                 neighbors.Clear();
                 neighbors.AddRange(levelBuilder.FindNeighbors(node));
                 if (node != null && attacks[playerNumber] < maxAttacks) {
@@ -245,18 +247,19 @@ public class GameController : MonoBehaviour
                             tmpNeighbors.Add(neighbors[i]);
                         }
                     }
+                    //Debug.Log("number of neighbors " + tmpNeighbors.Count);
                     if (tmpNeighbors.Count != 0) {
-                        targetNode = tmpNeighbors[Random.Range(0, tmpNeighbors.Count-1)];
+                        targetNode = tmpNeighbors[Random.Range(0, tmpNeighbors.Count)];
                         //attack random neighbor
                         testLine = levelBuilder.GetConnectionController(node, targetNode);
                         //if testLine
-                        testLine.StartAttack(node.transform, node.GetComponent<NodeController>().GetColor(), Random.Range(1,3));
+                        testLine.StartAttack(node.transform, node.GetComponent<NodeController>().GetColor(), Random.Range(1,4));
                         //increment attack count and reset the loop to find a new node that can attack
                         attacks[playerNumber] = attacks[playerNumber]+1;
-                        // attacks[playerNumber]= ++;
                     }
                 }
-            // }
+            }
+            
         }
     }
 }
