@@ -58,12 +58,22 @@ public class LevelBuilder : MonoBehaviour
         GameController gameController = GameObject.Find("Game Controller").GetComponent<GameController>();
         gameController.SetNodesLines(nodes, connectionLines);
 
-        // Assign the start nodes for player and computer
-        gameController.updateOwnership(nodes[0], 1, 1);
-        gameController.updateOwnership(nodes[levelData.nodeCount - 1], 2, 3);
+        // Assign the start nodes for players
+        for (int i = 0; i < levelData.homeBases.GetLength(0); i++)
+        {
+            gameController.updateOwnership(nodes[levelData.homeBases[i, 0] - 1], levelData.homeBases[i, 1], levelData.homeBases[i, 2]);
+        }
 
         //start computer players
+<<<<<<< HEAD
         gameController.StartComputerPlayer(3, 3);
+=======
+        for (int i = 0; i < levelData.cpuPlayers.Length; i++)
+        {
+            gameController.StartComputerPlayer(levelData.cpuPlayers[i], 1);
+        }
+        // gameController.StartComputerPlayer(2, 1);
+>>>>>>> f64c5cf3a7aa2d39992922addc4aad0952652f10
     }
 
     // Return the LineController object that connects the two input nodes
@@ -153,6 +163,8 @@ public class LevelBuilder : MonoBehaviour
                     // Add node count and initialize positions array and connections matrix... I think this must happen before nodes and connections
                     result.nodeCount = int.Parse(splitLine[1]);
                     result.nodePositions = new Vector3[result.nodeCount];
+                    result.homeBases = new int[0, 3];
+                    result.cpuPlayers = new int[0];
                     // c# arrays (and I assume matrices) are initialized to 0
                     result.nodeConnections = new int[result.nodeCount, result.nodeCount];
                 } else if (splitLine[0] == "ld") {
@@ -165,6 +177,28 @@ public class LevelBuilder : MonoBehaviour
                 } else if (splitLine[0] == "c") {
                     // Add connection between nodes
                     result.nodeConnections[int.Parse(splitLine[1]) - 1, int.Parse(splitLine[2]) - 1] = 1;
+                } else if (splitLine[0] == "s") {
+                    // Add starting player and shape for a node
+                    // unintelligently dynamically resize this matrix
+                    int[,] temp = new int[result.homeBases.GetLength(0) + 1, 3];
+                    for (int i = 0; i < result.homeBases.GetLength(0); i++) {
+                        for (int j = 0; j < 3; j++) {
+                            temp[i, j] = result.homeBases[i, j];
+                        }
+                    }
+                    temp[result.homeBases.GetLength(0), 0] = int.Parse(splitLine[1]);
+                    temp[result.homeBases.GetLength(0), 1] = int.Parse(splitLine[2]);
+                    temp[result.homeBases.GetLength(0), 2] = int.Parse(splitLine[3]);
+                    result.homeBases = temp;
+                } else if (splitLine[0] == "cpu") {
+                    // Add computer player
+                    // unintelligently dynamically resize this array
+                    int[] temp = new int[result.cpuPlayers.Length + 1];
+                    for (int i = 0; i < result.cpuPlayers.Length; i++) {
+                        temp[i] = result.cpuPlayers[i];
+                    }
+                    temp[result.cpuPlayers.Length] = int.Parse(splitLine[1]);
+                    result.cpuPlayers = temp;
                 } else {
                     Debug.LogWarning("Unrecognized line in level data: " + line);
                 }
@@ -180,6 +214,10 @@ public class LevelBuilder : MonoBehaviour
         public int nodeCount;
         public Vector3[] nodePositions;
         public int[,] nodeConnections; // uniform array
+        // each row is [node index, starting player, starting shape]
+        // For example [10, 2, 3] means node 10 starts as player 2 with shape 3 (triangle)
+        public int[,] homeBases;
+        public int[] cpuPlayers;
         public override readonly string ToString()
         {
             return "Level: " + level + " Description: " + levelDescription;
@@ -194,11 +232,5 @@ public class LevelBuilder : MonoBehaviour
     public int GetLevelNumber()
     {
         return levelNumber;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
