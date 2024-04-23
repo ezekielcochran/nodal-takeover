@@ -197,7 +197,7 @@ public class GameController : MonoBehaviour
     }
 
     public void StartComputerPlayer(int playerNumber, int maxAttacks) {
-        StartCoroutine(computerPlayer(2, 3));
+        StartCoroutine(computerPlayer(playerNumber, maxAttacks));
     }
 
     IEnumerator computerPlayer(int playerNumber, int maxAttacks) {
@@ -249,6 +249,7 @@ public class GameController : MonoBehaviour
                         targetNode = tmpNeighbors[Random.Range(0, tmpNeighbors.Count-1)];
                         //attack random neighbor
                         testLine = levelBuilder.GetConnectionController(node, targetNode);
+                        //if testLine
                         testLine.StartAttack(node.transform, node.GetComponent<NodeController>().GetColor(), Random.Range(1,3));
                         //increment attack count and reset the loop to find a new node that can attack
                         attacks[playerNumber] = attacks[playerNumber]+1;
