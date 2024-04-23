@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 public class GameController : MonoBehaviour
 {
 
@@ -199,6 +200,10 @@ public class GameController : MonoBehaviour
         if (winner > 0){
             Debug.Log("Player " + winner + " wins!");
             Time.timeScale = 0;
+            // reload the current level
+            Scene temp = SceneManager.GetActiveScene();
+            SceneManager.LoadScene("Level Select");
+            SceneManager.LoadScene(temp.name);
         }
         // If this is the furthest unlocked level, unlock the next one
         // Note that this does NOT check whether the next level actually exists

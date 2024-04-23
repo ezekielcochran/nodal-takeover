@@ -134,6 +134,22 @@ public class LineController : MonoBehaviour
         }
     }
 
+    public void UpdateIntendedShape(Transform origin, int newShape)
+    {
+        if (origin == leftPoint)
+        {
+            leftIntendedShape = newShape;
+        }
+        else if (origin == rightPoint)
+        {
+            rightIntendedShape = newShape;
+        }
+        else
+        {
+            Debug.LogError("Error: LineController.UpdateIntendedShape() called with a transform that is not a start or end point");
+        }
+    }
+
     public void StopAttack(Transform origin)
     {
         if (origin == leftPoint)
