@@ -35,14 +35,14 @@ public class GameController : MonoBehaviour
         Random.seed = (int)Time.deltaTime;
     }
 
-    void Update() {
-        if (Input.GetKeyDown(KeyCode.A)) {
-            GameObject testEnemyNode = nodes[nodes.Length - 1];
-            GameObject[] neighbors = levelBuilder.FindNeighbors(testEnemyNode);
-            LineController testLine = levelBuilder.GetConnectionController(testEnemyNode, neighbors[0]);
-            testLine.StartAttack(testEnemyNode.transform, Color.blue, testEnemyNode.GetComponent<NodeController>().GetShape());
-        }
-    }
+    // void Update() {
+    //     if (Input.GetKeyDown(KeyCode.A)) {
+    //         GameObject testEnemyNode = nodes[nodes.Length - 1];
+    //         GameObject[] neighbors = levelBuilder.FindNeighbors(testEnemyNode);
+    //         LineController testLine = levelBuilder.GetConnectionController(testEnemyNode, neighbors[0]);
+    //         testLine.StartAttack(testEnemyNode.transform, Color.blue, testEnemyNode.GetComponent<NodeController>().GetShape());
+    //     }
+    // }
 
     public void SetNodesLines(GameObject[] nodes, GameObject[,] connectionLines)
     {
@@ -207,9 +207,9 @@ public class GameController : MonoBehaviour
             Debug.Log("Updating levelsUnlocked to " + (levelsUnlocked + 1));
             PlayerPrefs.SetInt("levelsUnlocked", levelsUnlocked + 1);
         }
-        else
+        else if (winner == 1)
         {
-            Debug.Log("Levels Unlocked not affected.");
+            Debug.Log("Player win but Levels Unlocked not affected.");
         }
     }
 
