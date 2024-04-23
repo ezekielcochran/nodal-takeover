@@ -27,6 +27,7 @@ public class GameController : MonoBehaviour
 
     //number of current attacks for each player
     private int[] attacks = new int[5]; 
+    private const float GLOAT_TIME = 3.0f;
 
     void Start(){
         levelBuilder = GameObject.Find("Level Elements").GetComponent<LevelBuilder>();
@@ -34,14 +35,14 @@ public class GameController : MonoBehaviour
         Random.seed = (int)Time.deltaTime;
     }
 
-    void Update() {
-        if (Input.GetKeyDown(KeyCode.A)) {
-            GameObject testEnemyNode = nodes[nodes.Length - 1];
-            GameObject[] neighbors = levelBuilder.FindNeighbors(testEnemyNode);
-            LineController testLine = levelBuilder.GetConnectionController(testEnemyNode, neighbors[0]);
-            testLine.StartAttack(testEnemyNode.transform, Color.blue, testEnemyNode.GetComponent<NodeController>().GetShape());
-        }
-    }
+    // void Update() {
+    //     if (Input.GetKeyDown(KeyCode.A)) {
+    //         GameObject testEnemyNode = nodes[nodes.Length - 1];
+    //         GameObject[] neighbors = levelBuilder.FindNeighbors(testEnemyNode);
+    //         LineController testLine = levelBuilder.GetConnectionController(testEnemyNode, neighbors[0]);
+    //         testLine.StartAttack(testEnemyNode.transform, Color.blue, testEnemyNode.GetComponent<NodeController>().GetShape());
+    //     }
+    // }
 
     public void SetNodesLines(GameObject[] nodes, GameObject[,] connectionLines)
     {
@@ -58,30 +59,30 @@ public class GameController : MonoBehaviour
 
     // for use by node controller
     // when a node is clicked, it's node controller will call this function
-    public void reportClick(GameObject node)
+    public void ReportClick(GameObject node)
     {
 
         if (selectedNode == null){
             if (IsOwned(node, 1)){
                 selectedNode = node;
-                updateTargetNeighbors();
-                pulseAll();
+                UpdateTargetNeighbors();
+                PulseAll();
             }
         } else {
             if (targetNode == null){
                 if (node == selectedNode){  // If the player clicks the selected node again, deselect it
-                    pulseAll();
+                    PulseAll();
                     selectedNode = null;
                     targetNeighbors = null;
                 } else if (node == background){ // If the player clicks another node that they own, change the selected node
-                    pulseAll();
+                    PulseAll();
                     selectedNode = null;
                     targetNeighbors = null;
                 } else if (IsOwned(node, 1)){
-                    pulseAll();
+                    PulseAll();
                     selectedNode = node;
-                    updateTargetNeighbors();
-                    pulseAll();
+                    UpdateTargetNeighbors();
+                    PulseAll();
                 } else {
                     targetNode = node;
                     targetOriginalShape = targetNode.GetComponent<SpriteRenderer>().sprite;
@@ -89,32 +90,32 @@ public class GameController : MonoBehaviour
                 }
             } else { // If both selectedNode and targetNode are selected
                 if (node == selectedNode){  // If the player clicks the selected node again, deselect everything
-                    pulseAll();
-                    resetTargetShape();
+                    PulseAll();
+                    ResetTargetShape();
                     targetNode = null;
                     selectedNode = null;
                     targetNeighbors = null;
                     targetOriginalShape = null;
                 } else if (node == background){ // If the player clicks another node that they own, change the selected node
-                    initiateAttack();
-                    pulseAll();
-                    resetTargetShape();
+                    InitiateAttack();
+                    PulseAll();
+                    ResetTargetShape();
                     targetNode = null;
                     selectedNode = null;
                     targetNeighbors = null;
                     targetOriginalShape = null;
                 } else if (IsOwned(node, 1)){ // If the player clicks another node that they own, start the attack and then change the selected node
-                    initiateAttack();
-                    pulseAll();
-                    resetTargetShape();
+                    InitiateAttack();
+                    PulseAll();
+                    ResetTargetShape();
                     targetNode = null;
                     selectedNode = node;
-                    updateTargetNeighbors();
+                    UpdateTargetNeighbors();
                     targetOriginalShape = null;
                 } else if (node == targetNode){ // If the player clicks on the target node, toggle the shape
                     node.GetComponent<NodeController>().toggleShape();
                 } else { // If the player clicks on another possible target node, change targets.
-                    resetTargetShape();
+                    ResetTargetShape();
                     targetNode = node;
                     targetOriginalShape = targetNode.GetComponent<SpriteRenderer>().sprite;
                     node.GetComponent<NodeController>().toggleShape();
@@ -125,29 +126,29 @@ public class GameController : MonoBehaviour
 
     // Helper functions for handling node clicks//
 
-    private void initiateAttack(){
+    private void InitiateAttack(){
         LineController lineController = levelBuilder.GetConnectionController(selectedNode, targetNode);
         lineController.StartAttack(selectedNode.transform, selectedNode.GetComponent<NodeController>().GetColor(), targetNode.GetComponent<NodeController>().GetTransientShape());
     }
 
-    private void launchAttack(GameObject node){
+    private void LaunchAttack(GameObject node){
         // updateTargetNeighbors(node);
         // pulseAll();
     }
 
-    private void resetTargetShape(){
+    private void ResetTargetShape(){
         targetNode.GetComponent<SpriteRenderer>().sprite = targetOriginalShape;
     }
 
     // Assumes that a node is selected and its neighbors have already been updated for the current selected Node
-    private void pulseAll(){
+    private void PulseAll(){
         selectedNode.GetComponent<NodeController>().activatePulse();
         for (int i = 0; i < targetNeighbors.Length; i++){
             targetNeighbors[i].GetComponent<NodeController>().activatePulse();
         }
     }
 
-    private void updateTargetNeighbors(){
+    private void UpdateTargetNeighbors(){
         List<GameObject> tmpNeighbors = new List<GameObject>();
         GameObject[] neighbors = levelBuilder.FindNeighbors(selectedNode);
         for (int i = 0; i < neighbors.Length; i++){
@@ -166,7 +167,7 @@ public class GameController : MonoBehaviour
 
     // This function needs to not only update the ownership of the node, but also clear all other outgoing attack lines, and any completed incoming ones
     public void ReportConquer(GameObject source, GameObject target, int shape){
-        updateOwnership(target, GetNodeOwnership(source), shape);
+        UpdateOwnership(target, GetNodeOwnership(source), shape);
         //tell the ai/player that it has 1 more attack now that it succeeded
         attacks[GetNodeOwnership(source)]--;
         GameObject[] neighbors = levelBuilder.FindNeighbors(target);
@@ -182,7 +183,7 @@ public class GameController : MonoBehaviour
     }
 
     // node - the node to be updated, player - the player who now owns the node 
-    public void updateOwnership(GameObject node, int player, int shape)
+    public void UpdateOwnership(GameObject node, int player, int shape)
     {
         int nodeIndex = levelBuilder.NodeToIndex(node);
         nodeOwnership[nodeIndex] = player;
@@ -190,8 +191,37 @@ public class GameController : MonoBehaviour
         node.GetComponent<NodeController>().setShape(shape);
         // Debug.Log("In Game Controller, node " + nodeIndex + " is now owned by player " + player + " with shape " + shape);
         // Debug.Log("And node " + nodeIndex + " is reporting shape " + node.GetComponent<NodeController>().GetShape());
+        CheckGameOver();
+    }
 
-        // want to remove all 
+    private void CheckGameOver() {
+        winner = CheckWinnerNumber();
+        if (winner > 0){
+            Debug.Log("Player " + winner + " wins!");
+            Time.timeScale = 0;
+        }
+        // If this is the furthest unlocked level, unlock the next one
+        // Note that this does NOT check whether the next level actually exists
+        int levelsUnlocked = PlayerPrefs.GetInt("levelsUnlocked");
+        if (winner == 1 && levelsUnlocked == levelBuilder.GetLevelNumber()){
+            Debug.Log("Updating levelsUnlocked to " + (levelsUnlocked + 1));
+            PlayerPrefs.SetInt("levelsUnlocked", levelsUnlocked + 1);
+        }
+        else if (winner == 1)
+        {
+            Debug.Log("Player win but Levels Unlocked not affected.");
+        }
+    }
+
+    // returns -1 if there is no winner, otherwise returns the winning player number
+    private int CheckWinnerNumber(){
+        int potential = nodeOwnership[0];
+        for (int i = 1; i < nodeOwnership.Length; i++){
+            if (nodeOwnership[i] != potential){
+                return -1;
+            }
+        }
+        return potential;
     }
 
     private bool IsOwned(GameObject node, int playerNumber){
@@ -203,10 +233,10 @@ public class GameController : MonoBehaviour
     }
 
     public void StartComputerPlayer(int playerNumber, int maxAttacks) {
-        StartCoroutine(computerPlayer(playerNumber, maxAttacks));
+        StartCoroutine(ComputerPlayer(playerNumber, maxAttacks));
     }
 
-    IEnumerator computerPlayer(int playerNumber, int maxAttacks) {
+    IEnumerator ComputerPlayer(int playerNumber, int maxAttacks) {
         GameObject node = null;
         GameObject targetNode = null;
         List<GameObject> neighbors = new List<GameObject>(); 
@@ -223,7 +253,7 @@ public class GameController : MonoBehaviour
         while (winner <= 0) {
             node = null;
             yield return null;
-            Debug.Log("Current attacks and max attacks" + attacks[playerNumber] + " " + maxAttacks);
+            // Debug.Log("Current attacks and max attacks" + attacks[playerNumber] + " " + maxAttacks);
             //if we can do another attack
             if (attacks[playerNumber] < maxAttacks) {
                 ownedNodes = 0;

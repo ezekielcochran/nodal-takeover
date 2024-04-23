@@ -1,0 +1,10 @@
+ld The first level! no opponents
+
+nc 2
+
+n 1 0.25 0.5
+n 2 0.75 0.5
+
+c 1 2
+
+s 1 1 1

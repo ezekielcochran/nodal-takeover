@@ -36,7 +36,7 @@ public class NodeController : MonoBehaviour
     // Update is called once per frame
     void OnMouseDown()
     {
-        gameController.reportClick(gameObject);
+        gameController.ReportClick(gameObject);
     }
 
     public void toggleShape(){

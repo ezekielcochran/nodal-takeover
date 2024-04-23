@@ -91,7 +91,7 @@ public class UINavigation : MonoBehaviour
         }
         catch (System.NullReferenceException)
         {
-            Debug.Log("Tried to check Next level but Level Elements not found");
+            Debug.Log("Tried to check Next level but Level Elements or Next Level Button or another game object not found");
             return;
         }
     }
@@ -109,6 +109,16 @@ public class UINavigation : MonoBehaviour
             Debug.Log("Tried to load Previous Level but Level Elements not found");
             return;
         }
+    }
+
+    public void PauseGame()
+    {
+        Time.timeScale = 0;
+    }
+
+    public void ResumeGame()
+    {
+        Time.timeScale = 1;
     }
 
     // Update is called once per frame

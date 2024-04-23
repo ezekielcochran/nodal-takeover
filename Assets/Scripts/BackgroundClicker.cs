@@ -15,6 +15,6 @@ public class BackgroundClicker : MonoBehaviour
     // Start is called before the first frame update
     void OnMouseDown()
     {
-        gameController.reportClick(gameObject);
+        gameController.ReportClick(gameObject);
     }
 }
