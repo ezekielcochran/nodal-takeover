@@ -61,7 +61,7 @@ public class LevelBuilder : MonoBehaviour
         // Assign the start nodes for players
         for (int i = 0; i < levelData.homeBases.GetLength(0); i++)
         {
-            gameController.updateOwnership(nodes[levelData.homeBases[i, 0] - 1], levelData.homeBases[i, 1], levelData.homeBases[i, 2]);
+            gameController.UpdateOwnership(nodes[levelData.homeBases[i, 0] - 1], levelData.homeBases[i, 1], levelData.homeBases[i, 2]);
         }
 
         //start computer players

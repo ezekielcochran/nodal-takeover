@@ -164,6 +164,23 @@ public class LineController : MonoBehaviour
         }
     }
 
+    // As of 02/23/24 at 10:00, this function is untested
+    public void PauseAttack(Transform origin)
+    {
+        if (origin == leftPoint)
+        {
+            leftActive = false;
+        }
+        else if (origin == rightPoint)
+        {
+            rightActive = false;
+        }
+        else
+        {
+            Debug.LogError("Error: LineController.PauseAttack() called with a transform that is not a start or end point");
+        }
+    }
+
     private void PruneFinishedAttacks()
     {
         if (leftAttackLine != null && leftAttackProgress >= 1.0f)
@@ -191,13 +208,13 @@ public class LineController : MonoBehaviour
             Debug.Assert(leftAttackLine != null || rightAttackLine != null, "Error: LineController.UpdateAttacks() called with no active attacks");
 
             // only the left is attacking
-            if (rightAttackLine == null)
+            if (rightAttackLine == null || rightActive == false) // The second check allows inactive attacks to be bulldozed by active ones
             {
                 leftAttackProgress += dx;
                 UpdateAttack(leftPoint, leftAttackProgress);
             }
             // only the right is attacking
-            else if (leftAttackLine == null)
+            else if (leftAttackLine == null || leftActive == false)
             {
                 rightAttackProgress += dx;
                 UpdateAttack(rightPoint, rightAttackProgress);
@@ -221,14 +238,16 @@ public class LineController : MonoBehaviour
                         leftAttackProgress -= overflow / 2;
                         rightAttackProgress -= overflow / 2;
                     }
-                    // Left shape wins, so right atack is pushed back
+                    // Left shape wins, so left slows down and right is pushed back
                     else if (BeatsShape(leftShape, rightShape) == 1)
                     {
+                        leftAttackProgress -= dx / 2;
                         rightAttackProgress = 1 - leftAttackProgress;
                     }
                     // Right shape wins, so left attack is pushed back
                     else if (BeatsShape(leftShape, rightShape) == -1)
                     {
+                        rightAttackProgress -= dx / 2;
                         leftAttackProgress = 1 - rightAttackProgress;
                     }
                     else
