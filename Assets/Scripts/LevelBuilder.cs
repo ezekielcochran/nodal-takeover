@@ -65,9 +65,10 @@ public class LevelBuilder : MonoBehaviour
         }
 
         //start computer players
+        gameController.numComputers(levelData.cpuPlayers.Length);
         for (int i = 0; i < levelData.cpuPlayers.Length; i++)
         {
-            gameController.StartComputerPlayer(levelData.cpuPlayers[i], 1);
+            gameController.StartComputerPlayer(levelData.cpuPlayers[i], 2);
         }
         // gameController.StartComputerPlayer(2, 1);
     }

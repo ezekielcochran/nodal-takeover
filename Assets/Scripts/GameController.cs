@@ -27,13 +27,13 @@ public class GameController : MonoBehaviour
     private int winner = -1;
 
     //number of current attacks for each player
-    private int[] attacks = new int[5]; 
+    private int[] attacks; 
     private const float GLOAT_TIME = 3.0f;
 
     void Start(){
         levelBuilder = GameObject.Find("Level Elements").GetComponent<LevelBuilder>();
         background = GameObject.Find("Background");
-        Random.seed = (int)Time.deltaTime;
+        UnityEngine.Random.InitState((int)System.DateTime.Now.Ticks);
     }
 
     // void Update() {
@@ -237,6 +237,10 @@ public class GameController : MonoBehaviour
         return nodeOwnership[nodeIndex] == playerNumber; 
     }
 
+    public void numComputers(int numCPU) {
+        attacks = new int[numCPU+1];
+    }
+
     public void StartComputerPlayer(int playerNumber, int maxAttacks) {
         StartCoroutine(ComputerPlayer(playerNumber, maxAttacks));
     }
@@ -248,9 +252,7 @@ public class GameController : MonoBehaviour
         List<GameObject> attackNodes = new List<GameObject>();
         List<GameObject> tmpNeighbors = new List<GameObject>();
         LineController testLine;
-        int ownedNodes = 1;
         //int nodeIndex = 0;
-        int nodeConquer = 0;
         //var rnd = new Random();
         //Debug.Log("Cpu Instantiated");
 
@@ -258,17 +260,18 @@ public class GameController : MonoBehaviour
         while (winner <= 0) {
             node = null;
             yield return null;
-            // Debug.Log("Current attacks and max attacks" + attacks[playerNumber] + " " + maxAttacks);
+            //Debug.Log("Current attacks and max attacks" + attacks[playerNumber] + " " + maxAttacks);
             //if we can do another attack
+            //Debug.Log(Random.Range(0,10000));
+            //use up random numbers (will usually be random how many times this is run)
+            Random.Range(5,10000);
             if (attacks[playerNumber] < maxAttacks) {
-                ownedNodes = 0;
                 //iterate over the nodes and find one that can attack
                 attackNodes.Clear();
                 foreach (GameObject tmpNode in nodes) {
                     //if it is owned by this cpu
                     if(IsOwned(tmpNode, playerNumber)) {
                         attackNodes.Add(tmpNode);
-                        ownedNodes++;
                     }
                     //Debug.Log("Number Nodes: " + ownedNodes + " in cpu");
                 }
@@ -294,7 +297,6 @@ public class GameController : MonoBehaviour
                     }
                 }
             }
-            
         }
     }
 }
