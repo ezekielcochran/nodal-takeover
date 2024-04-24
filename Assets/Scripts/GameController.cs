@@ -12,7 +12,6 @@ public class GameController : MonoBehaviour
     private GameObject[,] connectionLines;
 
     LevelBuilder levelBuilder;
-    private GameObject background;
     
     // nodeSelected is the node that the player has selected to move from
     private GameObject selectedNode = null;
@@ -34,6 +33,7 @@ public class GameController : MonoBehaviour
         levelBuilder = GameObject.Find("Level Elements").GetComponent<LevelBuilder>();
         background = GameObject.Find("Background");
         UnityEngine.Random.InitState((int)System.DateTime.Now.Ticks);
+        Random.seed = (int)Time.deltaTime;
     }
 
     // void Update() {
@@ -63,78 +63,52 @@ public class GameController : MonoBehaviour
     public void ReportClick(GameObject node)
     {
 
-        if (selectedNode == null){
-            if (IsOwned(node, 1)){
-                selectedNode = node;
-                UpdateTargetNeighbors();
-                PulseAll();
+        if (IsOwned(node, 1)){
+            // Ensure that if a target has previously been selected it will stop pulsing
+            if (targetNode != null){
+                targetNode.GetComponent<NodeController>().DeactivatePulse();
+                ResetTargetShape();
             }
-        } else {
-            if (targetNode == null){
-                if (node == selectedNode){  // If the player clicks the selected node again, deselect it
-                    PulseAll();
-                    selectedNode = null;
-                    targetNeighbors = null;
-                } else if (node == background){ // If the player clicks another node that they own, change the selected node
-                    PulseAll();
-                    selectedNode = null;
-                    targetNeighbors = null;
-                } else if (IsOwned(node, 1)){
-                    PulseAll();
-                    selectedNode = node;
-                    UpdateTargetNeighbors();
-                    PulseAll();
-                } else {
-                    targetNode = node;
-                    targetOriginalShape = targetNode.GetComponent<SpriteRenderer>().sprite;
-                    node.GetComponent<NodeController>().toggleShape();
-                }
-            } else { // If both selectedNode and targetNode are selected
-                if (node == selectedNode){  // If the player clicks the selected node again, deselect everything
-                    PulseAll();
-                    ResetTargetShape();
-                    targetNode = null;
-                    selectedNode = null;
-                    targetNeighbors = null;
-                    targetOriginalShape = null;
-                } else if (node == background){ // If the player clicks another node that they own, change the selected node
-                    InitiateAttack();
-                    PulseAll();
-                    ResetTargetShape();
-                    targetNode = null;
-                    selectedNode = null;
-                    targetNeighbors = null;
-                    targetOriginalShape = null;
-                } else if (IsOwned(node, 1)){ // If the player clicks another node that they own, start the attack and then change the selected node
-                    InitiateAttack();
-                    PulseAll();
-                    ResetTargetShape();
-                    targetNode = null;
-                    selectedNode = node;
-                    UpdateTargetNeighbors();
-                    targetOriginalShape = null;
-                } else if (node == targetNode){ // If the player clicks on the target node, toggle the shape
-                    node.GetComponent<NodeController>().toggleShape();
-                } else { // If the player clicks on another possible target node, change targets.
-                    ResetTargetShape();
-                    targetNode = node;
-                    targetOriginalShape = targetNode.GetComponent<SpriteRenderer>().sprite;
-                    node.GetComponent<NodeController>().toggleShape();
-                }
+
+            if (targetNeighbors != null){
+                ActivatePulseNeighbors(false);
             }
-        }   
+
+            targetNode = null;
+            targetOriginalShape = null;
+
+            selectedNode = node;
+            UpdateTargetNeighbors();
+            ActivatePulseNeighbors(true);
+        } else if (selectedNode != null && targetNode == null){
+            bool valid = false;
+            // check to ensure the node is a target neighbor of the selected node
+            for (int i = 0; i < targetNeighbors.Length; i++){
+                if (node == targetNeighbors[i]){
+                    valid = true;
+                    break;
+                }
+            } if (valid){
+                targetNode = node;
+                targetOriginalShape = targetNode.GetComponent<SpriteRenderer>().sprite;
+                node.GetComponent<NodeController>().toggleShape();
+                ActivatePulseNeighbors(false);
+                targetNode.GetComponent<NodeController>().ActivatePulse();
+                InitiateAttack();
+            }
+        } else if (selectedNode != null && targetNode == node){
+                int typeShape = node.GetComponent<NodeController>().toggleShape();
+                LineController lineController = levelBuilder.GetConnectionController(selectedNode, targetNode);
+                lineController.UpdateIntendedShape(node.transform, typeShape);
+        }
     }
 
     // Helper functions for handling node clicks//
 
     private void InitiateAttack(){
         LineController lineController = levelBuilder.GetConnectionController(selectedNode, targetNode);
-        lineController.StartAttack(selectedNode.transform, selectedNode.GetComponent<NodeController>().GetColor(), targetNode.GetComponent<NodeController>().GetTransientShape());
-    }
-
-    private void LaunchAttack(GameObject node){
-        // updateTargetNeighbors(node);
-        // pulseAll();
+        selectedNode.GetComponent<NodeController>().CommenceAttack(lineController, selectedNode.transform, selectedNode.GetComponent<NodeController>().GetColor(), selectedNode.GetComponent<NodeController>().GetTransientShape());
+        // lineController.StartAttack(selectedNode.transform, selectedNode.GetComponent<NodeController>().GetColor(), targetNode.GetComponent<NodeController>().GetTransientShape());
     }
 
     private void ResetTargetShape(){
@@ -142,10 +116,17 @@ public class GameController : MonoBehaviour
     }
 
     // Assumes that a node is selected and its neighbors have already been updated for the current selected Node
-    private void PulseAll(){
-        selectedNode.GetComponent<NodeController>().activatePulse();
-        for (int i = 0; i < targetNeighbors.Length; i++){
-            targetNeighbors[i].GetComponent<NodeController>().activatePulse();
+    private void ActivatePulseNeighbors(bool activate){
+        if (activate){
+            selectedNode.GetComponent<NodeController>().ActivatePulse();
+            for (int i = 0; i < targetNeighbors.Length; i++){
+                targetNeighbors[i].GetComponent<NodeController>().ActivatePulse();
+            }
+        } else {
+            selectedNode.GetComponent<NodeController>().DeactivatePulse();
+            for (int i = 0; i < targetNeighbors.Length; i++){
+                targetNeighbors[i].GetComponent<NodeController>().DeactivatePulse();
+            }
         }
     }
 
@@ -175,10 +156,41 @@ public class GameController : MonoBehaviour
         for (int i = 0; i < neighbors.Length; i++){
             if (neighbors[i] != source) {
                 LineController lineController = levelBuilder.GetConnectionController(target, neighbors[i]);
-                lineController.StopAttackCleanConnections(target.transform);
-                
+                lineController.StopAttackCleanConnections(target.transform);                
             }
         }
+        // If the node captured was selected, reset it
+        if (source == selectedNode){
+            Debug.Log("1!!!");
+            selectedNode = null;
+            targetNeighbors = null;
+        }
+
+        // If the node captured was the target, reset it
+        if (target == targetNode){
+            target.GetComponent<NodeController>().DeactivatePulse();
+            targetNode = null;
+            targetOriginalShape = null;
+            Debug.Log("2!!!");
+        }
+
+        if (source == targetNode){
+            source.GetComponent<NodeController>().DeactivatePulse();
+        }
+
+        if (target == selectedNode){
+            ActivatePulseNeighbors(false);
+            // targetOriginalShape = null;
+            // targetNode = null;
+            // selectedNode = null;
+            Debug.Log("3!!!");
+        }
+
+        if (targetNode != null && selectedNode != null){
+            UpdateTargetNeighbors();
+            // ActivatePulseNeighbors(true);
+        }
+
         //if the node that just got taken over was attacking decrement attacks from that player
         //if (target.wasAttacking) {attacks[GetNodeOwnership(target)]--;}
     }
@@ -230,9 +242,6 @@ public class GameController : MonoBehaviour
     }
 
     private bool IsOwned(GameObject node, int playerNumber){
-        if (node == background) {
-            return false; 
-        }
         int nodeIndex = levelBuilder.NodeToIndex(node);
         return nodeOwnership[nodeIndex] == playerNumber; 
     }

@@ -75,6 +75,9 @@ public class LineController : MonoBehaviour
             return;
         }
 
+        // Handle if a previous attack was already in progress
+
+
         // We cannot attach multiple Renderers to the same object, so we spawn a new empty child object for the progress line
         LineRenderer attack;
         Transform destination;
@@ -136,11 +139,11 @@ public class LineController : MonoBehaviour
 
     public void UpdateIntendedShape(Transform origin, int newShape)
     {
-        if (origin == leftPoint)
+        if (origin == rightPoint)
         {
             leftIntendedShape = newShape;
         }
-        else if (origin == rightPoint)
+        else if (origin == leftPoint)
         {
             rightIntendedShape = newShape;
         }
@@ -277,12 +280,14 @@ public class LineController : MonoBehaviour
 
             // Did someone win?
             if (leftAttackProgress >= 1.0f) {
+                leftPoint.gameObject.GetComponent<NodeController>().AttackFinished();
                 gameController.ReportConquer(leftPoint.gameObject, rightPoint.gameObject, leftIntendedShape);
                 leftActive = false;
                 rightActive = false;
                 StopAttack(rightPoint);
             }
             if (rightAttackProgress >= 1.0f) {
+                rightPoint.gameObject.GetComponent<NodeController>().AttackFinished();
                 gameController.ReportConquer(rightPoint.gameObject, leftPoint.gameObject, rightIntendedShape);
                 leftActive = false;
                 rightActive = false;
