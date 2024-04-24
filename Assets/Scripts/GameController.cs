@@ -31,7 +31,7 @@ public class GameController : MonoBehaviour
 
     void Start(){
         levelBuilder = GameObject.Find("Level Elements").GetComponent<LevelBuilder>();
-        background = GameObject.Find("Background");
+        // background = GameObject.Find("Background");
         UnityEngine.Random.InitState((int)System.DateTime.Now.Ticks);
         Random.seed = (int)Time.deltaTime;
     }
@@ -213,9 +213,9 @@ public class GameController : MonoBehaviour
             Debug.Log("Player " + winner + " wins!");
             Time.timeScale = 0;
             // reload the current level
-            Scene temp = SceneManager.GetActiveScene();
-            SceneManager.LoadScene("Level Select");
-            SceneManager.LoadScene(temp.name);
+            // Scene temp = SceneManager.GetActiveScene();
+            // SceneManager.LoadScene("Level Select");
+            // SceneManager.LoadScene(temp.name);
         }
         // If this is the furthest unlocked level, unlock the next one
         // Note that this does NOT check whether the next level actually exists
@@ -242,6 +242,10 @@ public class GameController : MonoBehaviour
     }
 
     private bool IsOwned(GameObject node, int playerNumber){
+        // this special case added by zeke as a bug fix... not very thought through
+        if (node == GameObject.Find("Background")){
+            return false;
+        }
         int nodeIndex = levelBuilder.NodeToIndex(node);
         return nodeOwnership[nodeIndex] == playerNumber; 
     }
