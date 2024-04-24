@@ -121,6 +121,21 @@ public class UINavigation : MonoBehaviour
         Time.timeScale = 1;
     }
 
+    public void RestartLevel()
+    {
+        try
+        {
+            int currentLevel = GameObject.Find("Level Elements").GetComponent<LevelBuilder>().GetLevelNumber();
+            ToLevel(currentLevel);
+            Time.timeScale = 1;
+        }
+        catch (System.NullReferenceException)
+        {
+            Debug.Log("Tried to restart level but Level Elements not found");
+            return;
+        }
+    }
+
     // Update is called once per frame
     // void Update()
     // {

@@ -33,7 +33,13 @@ public class GameController : MonoBehaviour
     AudioManager audioManager; // this error should fix itself once merge is completed
 
     void Start(){
-        audioManager = GameObject.Find("Audio Manager").GetComponent<AudioManager>();
+        try {
+            audioManager = GameObject.Find("Audio Manager").GetComponent<AudioManager>();
+        }
+        catch
+        {
+            Debug.LogError("Audio Manager not found");
+        }
         levelBuilder = GameObject.Find("Level Elements").GetComponent<LevelBuilder>();
         // background = GameObject.Find("Background");
         UnityEngine.Random.InitState((int)System.DateTime.Now.Ticks);
@@ -167,7 +173,7 @@ public class GameController : MonoBehaviour
         }
         // If the node captured was selected, reset it
         if (source == selectedNode){
-            Debug.Log("1!!!");
+            // Debug.Log("1!!!");
             selectedNode = null;
             targetNeighbors = null;
         }
@@ -177,7 +183,7 @@ public class GameController : MonoBehaviour
             target.GetComponent<NodeController>().DeactivatePulse();
             targetNode = null;
             targetOriginalShape = null;
-            Debug.Log("2!!!");
+            // Debug.Log("2!!!");
         }
 
         if (source == targetNode){
@@ -189,7 +195,7 @@ public class GameController : MonoBehaviour
             // targetOriginalShape = null;
             // targetNode = null;
             // selectedNode = null;
-            Debug.Log("3!!!");
+            // Debug.Log("3!!!");
         }
 
         if (targetNode != null && selectedNode != null){
@@ -218,10 +224,34 @@ public class GameController : MonoBehaviour
         if (winner == 1){
             Debug.Log("Player " + winner + " wins!");
             Time.timeScale = 0;
+            GameObject pauseCanvas = GameObject.Find("Pause Canvas");
+            // iterate through children of pauseCanvas
+            foreach (Transform child in pauseCanvas.transform) {
+                if (child.gameObject.name == "Victory Menu") {
+                    child.gameObject.SetActive(true);
+                }
+                else if (child.gameObject.name == "Pause Button") {
+                    child.gameObject.SetActive(false);
+                }
+            }
         }
         else if (winner > 1) {
             Debug.Log("CPU " + (winner-1) + " wins!");
             Time.timeScale = 0;
+            GameObject pauseCanvas = GameObject.Find("Pause Canvas");
+            // iterate through children of pauseCanvas
+            foreach (Transform child in pauseCanvas.transform) {
+                if (child.gameObject.name == "Defeat Menu") {
+                    child.gameObject.SetActive(true);
+                }
+                else if (child.gameObject.name == "Pause Button") {
+                    child.gameObject.SetActive(false);
+                }
+            }
+        }
+        else
+        {
+            return;
         }
         // If this is the furthest unlocked level, unlock the next one
         // Note that this does NOT check whether the next level actually exists
