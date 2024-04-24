@@ -238,7 +238,7 @@ public class GameController : MonoBehaviour
     }
 
     public void numComputers(int numCPU) {
-        attacks = new int[numCPU+1];
+        attacks = new int[numCPU+2];
     }
 
     public void StartComputerPlayer(int playerNumber, int maxAttacks) {

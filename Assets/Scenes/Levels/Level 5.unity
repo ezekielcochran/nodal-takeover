@@ -406,11 +406,7 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d19c65b27b6a94f6896b85a04e025644, type: 3}
-<<<<<<< HEAD
 --- !u!1 &1453059546
-=======
---- !u!1 &1314472657
->>>>>>> cpu
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -418,13 +414,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-<<<<<<< HEAD
   - component: {fileID: 1453059548}
   - component: {fileID: 1453059547}
-=======
-  - component: {fileID: 1314472659}
-  - component: {fileID: 1314472658}
->>>>>>> cpu
   m_Layer: 0
   m_Name: Game Controller
   m_TagString: Untagged
@@ -432,41 +423,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
-<<<<<<< HEAD
 --- !u!114 &1453059547
-=======
---- !u!114 &1314472658
->>>>>>> cpu
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-<<<<<<< HEAD
   m_GameObject: {fileID: 1453059546}
-=======
-  m_GameObject: {fileID: 1314472657}
->>>>>>> cpu
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2739f8e29179a4a4a8ce71f5f265931e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-<<<<<<< HEAD
 --- !u!4 &1453059548
-=======
---- !u!4 &1314472659
->>>>>>> cpu
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-<<<<<<< HEAD
   m_GameObject: {fileID: 1453059546}
-=======
-  m_GameObject: {fileID: 1314472657}
->>>>>>> cpu
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 309.7558, y: 199.07608, z: -2.9603243}
@@ -588,9 +563,5 @@ SceneRoots:
   - {fileID: 1080029624}
   - {fileID: 1844655424}
   - {fileID: 629677201}
-<<<<<<< HEAD
   - {fileID: 1453059548}
   - {fileID: 2375753187221534653}
-=======
-  - {fileID: 1314472659}
->>>>>>> cpu
