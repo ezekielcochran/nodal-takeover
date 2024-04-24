@@ -29,11 +29,16 @@ public class GameController : MonoBehaviour
     private int[] attacks; 
     private const float GLOAT_TIME = 3.0f;
 
+    //audio manager
+    AudioManager audioManager; // this error should fix itself once merge is completed
+
     void Start(){
+        audioManager = GameObject.Find("Audio Manager").GetComponent<AudioManager>();
         levelBuilder = GameObject.Find("Level Elements").GetComponent<LevelBuilder>();
         // background = GameObject.Find("Background");
         UnityEngine.Random.InitState((int)System.DateTime.Now.Ticks);
         Random.seed = (int)Time.deltaTime;
+        audioManager.playMusic(audioManager.backgroundMusic);
     }
 
     // void Update() {
@@ -64,6 +69,7 @@ public class GameController : MonoBehaviour
     {
 
         if (IsOwned(node, 1)){
+            audioManager.playSFX(audioManager.clickNode); // MOVE TO AN APPROPRIATE PLACE
             // Ensure that if a target has previously been selected it will stop pulsing
             if (targetNode != null){
                 targetNode.GetComponent<NodeController>().DeactivatePulse();
@@ -209,13 +215,13 @@ public class GameController : MonoBehaviour
 
     private void CheckGameOver() {
         winner = CheckWinnerNumber();
-        if (winner > 0){
+        if (winner == 1){
             Debug.Log("Player " + winner + " wins!");
             Time.timeScale = 0;
-            // reload the current level
-            // Scene temp = SceneManager.GetActiveScene();
-            // SceneManager.LoadScene("Level Select");
-            // SceneManager.LoadScene(temp.name);
+        }
+        else if (winner > 1) {
+            Debug.Log("CPU " + (winner-1) + " wins!");
+            Time.timeScale = 0;
         }
         // If this is the furthest unlocked level, unlock the next one
         // Note that this does NOT check whether the next level actually exists
@@ -237,6 +243,10 @@ public class GameController : MonoBehaviour
             if (nodeOwnership[i] != potential){
                 return -1;
             }
+        }
+        if (potential > 1) {
+            //loop to make sure sound plays
+            for (int i = 0; i < 200; i++) audioManager.playSFX(audioManager.lose);
         }
         return potential;
     }
