@@ -9,6 +9,8 @@ public class NodeController : MonoBehaviour
     [SerializeField] private Sprite square;
     [SerializeField] private Sprite hexagon;
     [SerializeField] private Sprite triangle;
+
+    LineRenderer currentlyAttacking = null;
     
     private Sprite transientShape;
     private Sprite actualShape;
@@ -39,25 +41,31 @@ public class NodeController : MonoBehaviour
         gameController.ReportClick(gameObject);
     }
 
-    public void toggleShape(){
+    public int toggleShape(){
+        int shapeNum = -1;
         if (transientShape == circle)
         {
             transientShape = square;
+            shapeNum = 1;
         }
         else if (transientShape == square)
         {
             transientShape = hexagon;
+            shapeNum = 2;
         }
         else if (transientShape == hexagon)
         {
             transientShape = triangle;
+            shapeNum = 3;
         }
         else if (transientShape == triangle)
         {
             transientShape = square;
+            shapeNum = 1;
         }
         _render = GetComponent<SpriteRenderer>();
         _render.sprite = transientShape;
+        return shapeNum;
     }
 
     // May be unnecessary if GameController directly changes sprite type as it is currently in resetTargetShape()
@@ -113,8 +121,19 @@ public class NodeController : MonoBehaviour
         return -1;
     }
 
+    public void AttackFinished(){
+        currentlyAttacking = null;
+    }
+
+    public void CommenceAttack(LineController lineController, Transform origin, Color color, int targetIntendedShape){
+        if (currentlyAttacking != null){
+            currentlyAttacking.GetComponent<LineController>().PauseAttack(transform);
+        }
+        lineController.StartAttack(origin, color, targetIntendedShape);
+        currentlyAttacking = lineController.GetComponent<LineRenderer>();
+    }
+
     public Color GetColor(){
-        // Do i need to re-get the renderer every time?
         _render = GetComponent<SpriteRenderer>();
         return _render.color;
     }
@@ -123,16 +142,16 @@ public class NodeController : MonoBehaviour
         _render.color = playerColors[color];
     }
 
-    public void activatePulse(){
+    public void ActivatePulse(){
+        isPulsing = true;
         StartCoroutine(Pulse());
     }
 
-    private void togglePulse(){
-        isPulsing = !isPulsing;
+    public void DeactivatePulse(){
+        isPulsing = false;
     }
 
     IEnumerator Pulse(){
-        togglePulse();
         int direction = 1;
         float scaleSpeed = 0.003f;
         float scale = 1.3f;
